@@ -1,3 +1,7 @@
+# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# All rights reserved.
+# See LICENSE for details.
+
 """An algebraically closed interval system on the extended real set.
 
 This module provides the interval class, which is usually imported

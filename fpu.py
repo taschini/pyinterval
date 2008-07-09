@@ -1,3 +1,7 @@
+# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# All rights reserved.
+# See LICENSE for details.
+
 """Floating-point unit control and helper functions.
 
 This module provides:
