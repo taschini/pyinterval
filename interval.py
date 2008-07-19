@@ -143,7 +143,7 @@ class interval(tuple):
             >>> interval.hull((interval[1, 3], interval[10, 15]))
             interval([1.0, 15.0])
 
-            >>> interval.hull([interval(1,2)])
+            >>> interval.hull([interval(1, 2)])
             interval([1.0, 2.0])
 
         """
@@ -169,7 +169,13 @@ class interval(tuple):
         return self.format("%s")
 
     def format(self, fs):
-        return 'interval(' + ', '.join('[' + ', '.join(fs % x for x in sorted(set(c))) + ']' for c in self) + ')'
+        """Format into a string using fs as format for the interval bounds.
+
+            >>> interval[-2.1, 3.4].format("%+g")
+            'interval([-2.1, +3.4])'
+
+        """
+        return type(self).__name__ + '(' + ', '.join('[' + ', '.join(fs % x for x in sorted(set(c))) + ']' for c in self) + ')'
 
     def __pos__(self):
         return self
@@ -326,7 +332,7 @@ class interval(tuple):
             return (x - f(x) / p(i)) & i
         if opts['verbose']:
             def log(*a):
-                print ' '.join(str(x) for x in a)
+                print ' '.join(repr(x) for x in a)
         else:
             def log(*a):
                 pass
