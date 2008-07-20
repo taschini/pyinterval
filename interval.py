@@ -34,12 +34,10 @@ class Metaclass(type):
         return self(arg)
 
     def reload(self):
-        import sys
-        module = sys.modules[self.__module__]
-        main = sys.modules['__main__']
-        reload(module)
-        if main.interval == self:
-            main.interval = module.interval
+        import sys, __main__
+        module = reload(sys.modules[self.__module__])
+        if __main__.interval == self:
+            __main__.interval = module.interval
 
 
 class interval(tuple):
@@ -96,7 +94,7 @@ class interval(tuple):
 
     @classmethod
     def cast(cls, x):
-        y = float(x)
+        y = fpu.float(x)
         if isinstance(x, (int, long)) and x != y:
             # Special case for an integer with more bits than in a float's mantissa
             if x > y:
@@ -171,6 +169,8 @@ class interval(tuple):
     def format(self, fs):
         """Format into a string using fs as format for the interval bounds.
 
+        The argument fs can be any string format valid with floats:
+
             >>> interval[-2.1, 3.4].format("%+g")
             'interval([-2.1, +3.4])'
 
@@ -210,6 +210,8 @@ class interval(tuple):
         return self * other
 
     def inverse(self):
+        """Return self ** -1, or, equivalently, 1 / self."""
+
         return self.canonical(x for c in self for x in c.inverse())
 
     @coercing
@@ -319,8 +321,8 @@ class interval(tuple):
 
         For instance, the following solves x**3 == x in [-10, 10]:
 
-            >>> interval[-10, 10].newton(lambda x: x**3 - x, lambda x: 3*x**2 - 1)
-            interval([-1.0], [-0.0], [1.0])
+            >>> interval[-10, 10].newton(lambda x: x - x**3, lambda x: 1 - 3*x**2)
+            interval([-1.0], [0.0], [1.0])
 
         """
         invalid = set(opts) - set(self.newton.options)

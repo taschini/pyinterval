@@ -15,6 +15,9 @@ Limitations
     thought to be not thread-safe.
 """
 
+from __builtin__ import float
+
+
 def _init_libm():
     "Initialize low-level FPU control using C99 primitives in libm."
     global _fe_upward, _fe_downward, _fegetround, _fesetround
@@ -63,25 +66,20 @@ except:
     pass
 
 
-from numpy import nan, infty as infinity, finfo
-finfo = finfo(float)
+def infinity():
+    global infinity, nan
+    try:
+        infinity = float('inf')
+    except:
+        import struct
+        infinity = struct.unpack('!d','\x7f\xf0\x00\x00\x00\x00\x00\x00')[0]
+    nan = infinity / infinity
+infinity()
 
 
 def isnan(x):
     "Return True if x is nan."
     return x != x
-
-
-def nudge(x, dir):
-    "Nudge a float in the specified direction (dir = +1 or -1)."
-    assert dir in (-1, +1)
-    import math
-    f = dir * 2 ** (math.frexp(x)[1] - 1)
-    y = x + f * finfo.epsneg
-    if y != x:
-        return y
-    else:
-        return x + f * finfo.eps
 
 
 def down(f):
@@ -153,10 +151,3 @@ def power(x, n):
         else:
             result = result * result
     return result
-
-
-def intrepr(x):
-    "Return the interger pair (n, k) such that x = n * 2 ** k."
-    import math
-    m, e = math.frexp(x)
-    return int(m * 2 ** (finfo.nmant + 1)), e - (finfo.nmant + 1)

@@ -2,11 +2,10 @@
 # All rights reserved.
 # See LICENSE for details.
 
-from __future__ import with_statement
-
 import unittest
 import fpu
 from interval import interval
+
 
 class FpuTestCase(unittest.TestCase):
 
@@ -33,6 +32,8 @@ class FpuTestCase(unittest.TestCase):
 
     def test_ieee754(self):
         "fpu.float respect ieee754 semantics."
+        self.assertEqual(fpu.infinity + fpu.infinity, fpu.infinity)
+        self.assertTrue(fpu.isnan(fpu.nan))
         self.assertTrue(fpu.isnan(0.0 * fpu.infinity))
         self.assertTrue(fpu.isnan(fpu.infinity - fpu.infinity))
 
@@ -77,19 +78,6 @@ class FpuTestCase(unittest.TestCase):
         for i in range(11):
             self.assertEqual(2.0 ** i, fpu.power(2.0, i))
 
-    def test_nudge(self):
-        self.assertEqual(fpu.nudge(5249383869325653 * 2.0 ** -51, +1), 5249383869325654 * 2.0 ** -51)
-        self.assertEqual(fpu.nudge(5249383869325653 * 2.0 ** -51, -1), 5249383869325652 * 2.0 ** -51)
-        self.assertEqual(fpu.nudge(-5249383869325653 * 2.0 ** -51, +1), -5249383869325652 * 2.0 ** -51)
-        self.assertEqual(fpu.nudge(-5249383869325653 * 2.0 ** -51, -1), -5249383869325654 * 2.0 ** -51)
-        self.assertEqual(fpu.nudge(9007199254740991 * 2.0 ** -51, +1), 4503599627370496 * 2.0 ** -50)
-        self.assertEqual(fpu.nudge(16.0, -1), 9007199254740991 * 2.0 ** -49)
-        self.assertEqual(fpu.nudge(9007199254740991 * 2.0 ** -49, +1), 16.0)
-
-    def test_intrepr(self):
-        self.assertEqual(fpu.intrepr(5249383869325653 * 2.0 ** -51), (5249383869325653, -51))
-        self.assertEqual(fpu.intrepr(-5249383869325653 * 2.0 ** -51), (-5249383869325653, -51))
-
 
 class ModuleTestCase(unittest.TestCase):
 
@@ -122,16 +110,16 @@ class IntervalTestCase(unittest.TestCase):
 
     def test_canonical_constructor(self):
         self.assertEqual(interval([1, 3], [4, 6], [2, 5], 9), ((1, 6), (9, 9)))
-        self.assertEqual(interval[2 ** (fpu.finfo.nmant + 1) - 1], interval[9007199254740991.0])
-        self.assertEqual(interval[2 ** (fpu.finfo.nmant + 1) + 1], interval[4503599627370496 * 2.0, 4503599627370497 * 2.0])
-        self.assertEqual(interval[-2 ** (fpu.finfo.nmant + 1) + 1], interval[-9007199254740991.0])
-        self.assertEqual(interval[-2 ** (fpu.finfo.nmant + 1) - 1], interval[-4503599627370497 * 2.0, -4503599627370496 * 2.0])
-        self.assertEqual(interval[2 ** (fpu.finfo.nmant + 2) + 1], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
-        self.assertEqual(interval[2 ** (fpu.finfo.nmant + 2) + 2], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
-        self.assertEqual(interval[2 ** (fpu.finfo.nmant + 2) + 3], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
-        self.assertEqual(interval[-2 ** (fpu.finfo.nmant + 2) - 1], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
-        self.assertEqual(interval[-2 ** (fpu.finfo.nmant + 2) - 2], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
-        self.assertEqual(interval[-2 ** (fpu.finfo.nmant + 2) - 3], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
+        self.assertEqual(interval[2 ** (52 + 1) - 1], interval[9007199254740991.0])
+        self.assertEqual(interval[2 ** (52 + 1) + 1], interval[4503599627370496 * 2.0, 4503599627370497 * 2.0])
+        self.assertEqual(interval[-2 ** (52 + 1) + 1], interval[-9007199254740991.0])
+        self.assertEqual(interval[-2 ** (52 + 1) - 1], interval[-4503599627370497 * 2.0, -4503599627370496 * 2.0])
+        self.assertEqual(interval[2 ** (52 + 2) + 1], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
+        self.assertEqual(interval[2 ** (52 + 2) + 2], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
+        self.assertEqual(interval[2 ** (52 + 2) + 3], interval[4503599627370496 * 4.0, 4503599627370497 * 4.0])
+        self.assertEqual(interval[-2 ** (52 + 2) - 1], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
+        self.assertEqual(interval[-2 ** (52 + 2) - 2], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
+        self.assertEqual(interval[-2 ** (52 + 2) - 3], interval[-4503599627370497 * 4.0, -4503599627370496 * 4.0])
 
     def test_unary(self):
         self.assertEqual(interval[1, 2], +interval[1, 2])
