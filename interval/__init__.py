@@ -4,7 +4,7 @@
 
 """An algebraically closed interval system on the extended real set.
 
-This module provides the interval class, which is usually imported
+This package provides the interval class, which is usually imported
 into the current namespace:
 
     >>> from interval import interval
@@ -13,19 +13,28 @@ into the current namespace:
 
 """
 
-import fpu
+from . import fpu
 
 
 def coercing(f):
     from functools import wraps
     @wraps(f)
     def wrapper(self, other):
-        if not isinstance(other, self.__class__):
-            try:
-                other = self.cast(other)
-            except:
-                return NotImplemented
-        return f(self, other)
+        try:
+            return f(self, self.cast(other))
+        except self.ScalarError:
+            return NotImplemented
+    return wrapper
+
+
+def comp_by_comp(f):
+    from functools import wraps
+    @wraps(f)
+    def wrapper(self, other):
+        try:
+            return self._canonical(self.Component(*f(x, y)) for x in self for y in self.cast(other))
+        except self.ScalarError:
+            return NotImplemented
     return wrapper
 
 
@@ -39,32 +48,36 @@ class Metaclass(type):
         if __main__.interval == self:
             __main__.interval = module.interval
 
+    def add_method(self, f):
+        setattr(self, f.__name__, f)
+        return f
+
 
 class interval(tuple):
     """A (multi-)interval on the extended real set.
 
-    An interval is an immutable object.
+    An interval is an immutable object that is created by specifying
+    the end-points of its connected components:
 
         >>> interval([0, 1], [2, 3], [10, 15])
         interval([0.0, 1.0], [2.0, 3.0], [10.0, 15.0])
 
-    constructs an interval with three components, but if the interval
-    consists of only one component you can use the shorter form
+    constructs an interval whose arbitrary element x must satisfy 0 <=
+    x <= 1 or 2 <= x <= 3 or 10 <= x <= 15. Several shortcuts are
+    available:
+
+        >>> interval(1, [2, 3])
+        interval([1.0], [2.0, 3.0])
 
         >>> interval[1, 2]
         interval([1.0, 2.0])
 
-    Any component whose extrema coincide, a single number can be used
-    to denote the whole component:
-
         >>> interval[1]
         interval([1.0])
-        >>> interval[1] == interval(1)
-        True
 
-    Intervals are closed with respect to the arithmetic operations + -
-    * /, integer power, and the set operations & |. Casting is
-    provided for scalars in the real set.
+    Intervals are closed with respect to all arithmetic operations,
+    integer power, union, and intersection. Casting is provided for
+    scalars in the real set.
 
         >>> (1 + interval[3, 4] / interval[-1, 2]) & interval[-5, 5]
         interval([-5.0, -2.0], [2.5, 5.0])
@@ -90,11 +103,29 @@ class interval(tuple):
 
     @classmethod
     def new(cls, components):
+        "Create a new interval from existing components."
         return tuple.__new__(cls, components)
 
     @classmethod
     def cast(cls, x):
-        y = fpu.float(x)
+        """Cast a scalar to an interval.
+
+        If the argument is an interval, it is returned unchanged. If
+        the argument is not a scalar an interval.ScalarError is
+        raised::
+
+            >>> interval.cast('asd')
+            Traceback (most recent call last):
+            ...
+            ScalarError: Invalid scalar: 'asd'
+
+        """
+        if isinstance(x, cls):
+            return x
+        try:
+            y = fpu.float(x)
+        except:
+            raise cls.ScalarError("Invalid scalar: " + repr(x))
         if isinstance(x, (int, long)) and x != y:
             # Special case for an integer with more bits than in a float's mantissa
             if x > y:
@@ -104,7 +135,28 @@ class interval(tuple):
         return cls.new((cls.Component(y, y),))
 
     @classmethod
-    def canonical(cls, components):
+    def function(cls, f):
+        """Decorator creating an interval function from a function on a single component.
+
+        The original function accepts one argument and returns a sequence
+        of (inf, sup) pairs:
+
+            >>> @interval.function
+            ... def mirror(c):
+            ...    return (-c.sup, -c.inf), c
+            >>> mirror(interval([1, 2], 3))
+            interval([-3.0], [-2.0, -1.0], [1.0, 2.0], [3.0])
+
+        """
+
+        from functools import wraps
+        @wraps(f)
+        def wrapper(x):
+            return cls._canonical(cls.Component(*t) for c in cls.cast(x) for t in f(c))
+        return wrapper
+
+    @classmethod
+    def _canonical(cls, components):
         from operator import itemgetter
         components = [c for c in components if c.inf <= c.sup]
         components.sort(key=itemgetter(0))
@@ -129,7 +181,7 @@ class interval(tuple):
             interval([1.0, 6.0], [9.0])
 
         """
-        return cls.canonical(c for i in intervals for c in i)
+        return cls._canonical(c for i in intervals for c in i)
 
     @classmethod
     def hull(cls, intervals):
@@ -158,7 +210,7 @@ class interval(tuple):
 
     @property
     def extrema(self):
-        return self.canonical(self.Component(x, x) for c in self for x in c)
+        return self._canonical(self.Component(x, x) for c in self for x in c)
 
     def __repr__(self):
         return self.format("%r")
@@ -183,11 +235,9 @@ class interval(tuple):
     def __neg__(self):
         return self.new(self.Component(-x.sup, -x.inf) for x in self)
 
-    @coercing
-    def __add__(self, other):
-        return self.canonical(
-            self.Component(fpu.down(lambda: x.inf + y.inf), fpu.up(lambda: x.sup + y.sup))
-            for x in self for y in other)
+    @comp_by_comp
+    def __add__(x, y):
+        return (fpu.down(lambda: x.inf + y.inf), fpu.up(lambda: x.sup + y.sup))
 
     def __radd__(self, other):
         return self + other
@@ -198,21 +248,14 @@ class interval(tuple):
     def __rsub__(self, other):
         return (-self) + other
 
-    @coercing
-    def __mul__(self, other):
-        return self.canonical(
-            self.Component(
-                    fpu.down(lambda: fpu.min(x.cross(y))),
-                    fpu.up  (lambda: fpu.max(x.cross(y))))
-            for x in self for y in other)
+    @comp_by_comp
+    def __mul__(x, y):
+        return (
+            fpu.down(lambda: fpu.min((x.inf * y.inf, x.inf * y.sup, x.sup * y.inf, x.sup * y.sup))),
+            fpu.up  (lambda: fpu.max((x.inf * y.inf, x.inf * y.sup, x.sup * y.inf, x.sup * y.sup))))
 
     def __rmul__(self, other):
         return self * other
-
-    def inverse(self):
-        """Return self ** -1, or, equivalently, 1 / self."""
-
-        return self.canonical(x for c in self for x in c.inverse())
 
     @coercing
     def __div__(self, other):
@@ -227,19 +270,26 @@ class interval(tuple):
     __rtruediv__ = __rdiv__
 
     def __pow__(self, n):
-         if not isinstance(n, (int, long)):
-             return NotImplemented
-         if n < 0:
-             return (self ** -n).inverse()
-         return self.canonical(c ** n for c in self)
+        if not isinstance(n, (int, long)):
+            return NotImplemented
+        if n < 0:
+            return (self ** -n).inverse()
+        if n % 2:
+            def pow(c):
+                return (fpu.power_rd(c.inf, n), fpu.power_ru(c.sup, n))
+        else:
+            def pow(c):
+                if c.inf > 0:
+                    return (fpu.power_rd(c.inf, n), fpu.power_ru(c.sup, n))
+                if c.sup < 0:
+                    return (fpu.power_rd(c.sup, n), fpu.power_ru(c.inf, n))
+                else:
+                    return (0.0, fpu.max(fpu.power_ru(x, n) for x in c))
+        return self._canonical(self.Component(*pow(c)) for c in self)
 
-    @coercing
-    def __and__(self, other):
-        return self.canonical(
-            self.Component(
-                    fpu.max((x.inf, y.inf)),
-                    fpu.min((x.sup, y.sup)))
-            for x in self for y in other)
+    @comp_by_comp
+    def __and__(x, y):
+        return (fpu.max((x.inf, y.inf)), fpu.min((x.sup, y.sup)))
 
     def __rand__(self, other):
         return self & other
@@ -260,6 +310,10 @@ class interval(tuple):
         pass
 
 
+    class ScalarError(ValueError):
+        pass
+
+
     class Component(tuple):
 
         def __new__(cls, inf, sup):
@@ -275,9 +329,6 @@ class interval(tuple):
         def sup(self):
             return self[1]
 
-        def cross(self, other):
-            return (self.inf * other.inf, self.inf * other.sup, self.sup * other.inf, self.sup * other.sup)
-
         @property
         def inf_inv(self):
             return fpu.up(lambda: 1 / self.inf)
@@ -286,37 +337,8 @@ class interval(tuple):
         def sup_inv(self):
             return fpu.down(lambda: 1 / self.sup)
 
-        def inverse(self):
-            if self.inf <= 0 <= self.sup:
-                return (
-                    self.__class__(-fpu.infinity, self.inf_inv if self.inf != 0 else -fpu.infinity),
-                    self.__class__(self.sup_inv if self.sup != 0 else +fpu.infinity, +fpu.infinity))
-            else:
-                return (self.__class__(self.sup_inv, self.inf_inv),)
 
-        def __neg__(self):
-            return self.__class__(-self.sup, -self.inf)
-
-        def __pow__(self, n):
-            if self.inf > 0:
-                return self.__class__(
-                    fpu.down(lambda: fpu.power(self.inf, n)),
-                    fpu.up  (lambda: fpu.power(self.sup, n)))
-            if self.sup < 0:
-                if (-1) ** n > 0:
-                    return (-self)**n
-                else:
-                    return - (-self)**n
-            if (-1) ** n > 0:
-                return self.__class__(
-                    0,
-                    fpu.max(fpu.up(lambda: (fpu.power(self.inf, n), fpu.power(self.sup, n)))))
-            return self.__class__(
-                fpu.down(lambda: fpu.power(self.inf, n)),
-                fpu.up  (lambda: fpu.power(self.sup, n)))
-
-
-    def newton(self, f, p, **opts):
+    def newton(self, f, p, maxiter=10000, verbose=False):
         """Find the roots of f(x) (where p=df/dx) within self using Newton-Raphson.
 
         For instance, the following solves x**3 == x in [-10, 10]:
@@ -325,14 +347,9 @@ class interval(tuple):
             interval([-1.0], [0.0], [1.0])
 
         """
-        invalid = set(opts) - set(self.newton.options)
-        if invalid:
-            raise TypeError, "Unexpected keyword arguments: " + ', '.join(repr(x) for x in invalid)
-        for k, v in self.newton.options.iteritems():
-            opts.setdefault(k, v)
         def step(x, i):
             return (x - f(x) / p(i)) & i
-        if opts['verbose']:
+        if verbose:
             def log(*a):
                 print ' '.join(repr(x) for x in a)
         else:
@@ -340,7 +357,7 @@ class interval(tuple):
                 pass
         def branch(current):
             log("Branch", current)
-            for n in xrange(opts['maxiter']):
+            for n in xrange(maxiter):
                 previous = current
                 current = step(current.midpoint, current)
                 log("Step", current)
@@ -359,13 +376,22 @@ class interval(tuple):
             return self.new(())
         return self.union(branch(c) for c in self.components)
 
-    newton.options = dict(maxiter = 10000, verbose = False)
+
+def setup():
+    # The decorator interval.function can only be used from outside
+    # the original class scope.
+
+    @interval.add_method
+    @interval.function
+    def inverse(c):
+        """Return self ** -1, or, equivalently, 1 / self."""
+        if c.inf <= 0 <= c.sup:
+            return ((-fpu.infinity, c.inf_inv if c.inf != 0 else -fpu.infinity),
+                    (c.sup_inv if c.sup != 0 else +fpu.infinity, +fpu.infinity))
+        else:
+            return (c.sup_inv, c.inf_inv),
+setup()
 
 
 # Clean up the namespace
-del coercing, Metaclass
-
-
-if __name__  == '__main__':
-    import doctest
-    doctest.testmod()
+del coercing, comp_by_comp, setup, Metaclass

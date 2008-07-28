@@ -132,18 +132,14 @@ def max(l):
         return nan
 
 
-def power(x, n):
-    "Raise x to the n-th power with correct rounding."
-
-    if not isinstance(n, (int, long)):
-        return x ** n
-    if n < 0:
-        return 1/power(x, -n)
+def power_rn(x, n):
+    "Raise x to the n-th power (with n positive integer), rounded to nearest."
+    assert isinstance(n, (int, long)) and n >= 0
     l=();
     while n > 0:
         n, y= divmod(n, 2)
         l=(y, l)
-    result = 1
+    result = 1.0
     while l:
         y, l = l
         if y:
@@ -151,3 +147,23 @@ def power(x, n):
         else:
             result = result * result
     return result
+
+
+def power_ru(x, n):
+    "Raise x to the n-th power (with n positive integer), rounded toward +inf."
+    if x >= 0:
+        return up(lambda: power_rn(x, n))
+    elif n % 2:
+        return - down(lambda: power_rn(-x, n))
+    else:
+        return up(lambda: power_rn(-x, n))
+
+
+def power_rd(x, n):
+    "Raise x to the n-th power (with n positive integer), rounded toward -inf."
+    if x >= 0:
+        return down(lambda: power_rn(x, n))
+    elif n % 2:
+        return - up(lambda: power_rn(-x, n))
+    else:
+        return down(lambda: power_rn(-x, n))

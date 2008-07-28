@@ -65,24 +65,23 @@ class FpuTestCase(unittest.TestCase):
         # But using the built-in power operator, it doesn't necessarily do it
         # print fpu.down(lambda: x**3) < fpu.up(lambda: x**3))
         # So we define an integer power methods that does
-        self.assertTrue(fpu.down(lambda: fpu.power(x, 3)) < fpu.up(lambda: fpu.power(x, 3)))
+        self.assertTrue(fpu.power_rd(x, 3) < fpu.power_ru(x, 3))
+        self.assertTrue(fpu.power_rd(-x, 3) < fpu.power_ru(-x, 3))
+        self.assertTrue(fpu.power_rd(x, 4) < fpu.power_ru(x, 4))
+        self.assertTrue(fpu.power_rd(-x, 4) < fpu.power_ru(-x, 4))
 
-        self.assertEqual(32, fpu.power(2, 5))
         self.assertEqual(
             (fpu.down(lambda: x*x*x), fpu.up(lambda: x*x*x)),
-            (fpu.down(lambda: fpu.power(x, 3)), fpu.up(lambda: fpu.power(x, 3))))
-        self.assertEqual(1.25 ** 13, fpu.power(1.25, 13))
-        self.assertEqual((-1.25) ** 17, fpu.power(-1.25, 17))
-        self.assertEqual((-1.25) ** 18, fpu.power(-1.25, 18))
-        for i in range(11):
-            self.assertEqual(2.0 ** i, fpu.power(2.0, i))
+            (fpu.power_rd(x, 3), fpu.power_ru(x, 3)))
 
 
 class ModuleTestCase(unittest.TestCase):
 
     def test_namespace(self):
         import interval
-        self.assertEqual(dir(interval), ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'interval'])
+        # imath could be present or not.
+        names = sorted(set(dir(interval)) - set(['imath']))
+        self.assertEqual(names, ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'interval'])
 
 
 class IntervalTestCase(unittest.TestCase):
@@ -174,6 +173,7 @@ class IntervalTestCase(unittest.TestCase):
         self.assertEqual(interval[0, 4], interval[-1, 2] ** 2)
         self.assertEqual(interval[-27, 8], interval[-3, 2] ** 3)
         self.assertEqual(interval[-1, 2], (interval[-1,2]**-1)**-1)
+        self.assertEqual(interval([-0.38712442133802405]) ** 3, interval([-0.058016524353106828, -0.058016524353106808]))
 
         self.assertEqual(
             interval[fpu.down(lambda: (1/3.0)*(1/3.0)), fpu.up(lambda: (1/3.0)*(1/3.0))],
