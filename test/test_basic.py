@@ -3,8 +3,7 @@
 # See LICENSE for details.
 
 import unittest
-import fpu
-from interval import interval
+from interval import interval, fpu
 
 
 class FpuTestCase(unittest.TestCase):
@@ -83,7 +82,7 @@ class ModuleTestCase(unittest.TestCase):
 
     def test_namespace(self):
         import interval
-        self.assertEqual(dir(interval), ['__builtins__', '__doc__', '__file__', '__name__', 'fpu', 'interval'])
+        self.assertEqual(dir(interval), ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'interval'])
 
 
 class IntervalTestCase(unittest.TestCase):
