@@ -23,7 +23,12 @@ class app(object):
         for m in names:
             s.addTest(unittest.TestLoader().loadTestsFromModule(self._import('test.' + m)))
         for m in self.doctests:
-            s.addTest(doctest.DocTestSuite(self._import(m)))
+            try:
+                m = self._import(m)
+            except ImportError:
+                pass
+            else:
+                s.addTest(doctest.DocTestSuite(m))
         s.addTest(doctest.DocFileSuite(module_relative=False, *self.docfiles))
         return s
 
