@@ -8,7 +8,12 @@
 def main(argv = None):
     import test, glob
     import os.path as op
-    return test.app(doctests=['interval', 'test.helpers'], docfiles=glob.glob(op.join(op.dirname(__file__), 'doc', '*.rst'))).main(argv)
+    def jglob(*s):
+        return glob.glob(op.join(*s))
+    prefix = op.dirname(__file__)
+    return test.app(
+        doctests=['interval', 'test.helpers'],
+        docfiles=jglob(prefix, '*', '*.rst')).main(argv)
 
 
 if __name__ == '__main__':
