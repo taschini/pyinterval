@@ -14,6 +14,7 @@ into the current namespace:
 """
 
 from . import fpu
+inf = fpu.infinity
 
 
 def coercing(f):

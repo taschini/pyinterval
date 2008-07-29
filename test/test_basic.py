@@ -81,7 +81,7 @@ class ModuleTestCase(unittest.TestCase):
         import interval
         # imath could be present or not.
         names = sorted(set(dir(interval)) - set(['imath']))
-        self.assertEqual(names, ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'interval'])
+        self.assertEqual(names, ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'inf', 'interval'])
 
 
 class IntervalTestCase(unittest.TestCase):
