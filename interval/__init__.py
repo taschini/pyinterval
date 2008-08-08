@@ -339,7 +339,7 @@ class interval(tuple):
             return fpu.down(lambda: 1 / self.sup)
 
 
-    def newton(self, f, p, maxiter=10000, verbose=False):
+    def newton(self, f, p, maxiter=10000, tracer_cb=None):
         """Find the roots of f(x) (where p=df/dx) within self using Newton-Raphson.
 
         For instance, the following solves x**3 == x in [-10, 10]:
@@ -347,33 +347,30 @@ class interval(tuple):
             >>> interval[-10, 10].newton(lambda x: x - x**3, lambda x: 1 - 3*x**2)
             interval([-1.0], [0.0], [1.0])
 
+            >>> interval[-1.5, 3].newton(lambda x: (x**2 - 1)*(x - 2), lambda x:3*x**2 - 4*x -1)
+            interval([-1.0], [1.0], [2.0])
+
         """
         def step(x, i):
             return (x - f(x) / p(i)) & i
-        if verbose:
-            def log(*a):
-                print ' '.join(repr(x) for x in a)
-        else:
-            def log(*a):
-                pass
+        if tracer_cb is None:
+            def tracer_cb(tag, interval): pass
         def branch(current):
-            log("Branch", current)
+            tracer_cb('branch', current)
             for n in xrange(maxiter):
                 previous = current
                 current = step(current.midpoint, current)
-                log("Step", current)
+                tracer_cb('step', current)
                 if previous == current:
                     splits = [c for c in (step(x, current) for x in self.extrema.components) if c and c != current]
-                    log("Splits", *splits)
                     if splits:
                         return self.union(branch(c) for c in splits[:1])
                     return current
                 if not current:
-                    log("Dead end")
                     return current
                 if len(current) > 1:
                     return self.union(branch(c) for c in current.components)
-            log("Abandon")
+            tracer_cb("abandon", current)
             return self.new(())
         return self.union(branch(c) for c in self.components)
 
@@ -393,6 +390,7 @@ def setup():
             return (c.sup_inv, c.inf_inv),
 setup()
 
-
 # Clean up the namespace
 del coercing, comp_by_comp, setup, Metaclass
+
+from . import imath

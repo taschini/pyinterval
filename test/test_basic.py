@@ -79,9 +79,9 @@ class ModuleTestCase(unittest.TestCase):
 
     def test_namespace(self):
         import interval
-        # imath could be present or not.
-        names = sorted(set(dir(interval)) - set(['imath']))
-        self.assertEqual(names, ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'inf', 'interval'])
+        self.assertEqual(
+            dir(interval),
+            ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'imath', 'inf', 'interval'])
 
 
 class IntervalTestCase(unittest.TestCase):
