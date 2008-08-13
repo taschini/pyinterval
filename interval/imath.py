@@ -18,13 +18,15 @@ else:
     from . import interval, fpu
 
     class monotonic(object):
-        def __init__(self, domain = None):
+        def __init__(self, domain=None, rd=None, ru=None):
             self.domain = domain or interval[-fpu.infinity, fpu.infinity]
+            self.rd = rd
+            self.ru = ru
 
         def __call__(self, f):
             from functools import wraps
-            self.rd = getattr(crlibm, f.__name__ + '_rd')
-            self.ru = getattr(crlibm, f.__name__ + '_ru')
+            self.rd = self.rd or getattr(crlibm, f.__name__ + '_rd')
+            self.ru = self.ru or getattr(crlibm, f.__name__ + '_ru')
             @wraps(f)
             def wrapper(x):
                 return interval._canonical(type(c)(self.rd(c.inf), self.ru(c.sup))
@@ -79,6 +81,37 @@ else:
 
     pi = 4 * atan(1)
     e = exp(1)
+
+    def tanh():
+        one_rd = crlibm.log_rd(crlibm.exp_rd(1))
+
+        def tanh_rd(x):
+            if x < 0:
+                return -tanh_ru(-x)
+            if x == fpu.infinity:
+                return 1.0
+            s, c = crlibm.sinh_rd(x), crlibm.cosh_ru(x)
+            if fpu.infinity in (s, c):
+                return one_rd
+            return fpu.down(lambda: s/c)
+
+        def tanh_ru(x):
+            if x < 0:
+                return -tanh_rd(-x)
+            if x == fpu.infinity:
+                return 1.0
+            s, c = crlibm.sinh_ru(x), crlibm.cosh_rd(x)
+            if fpu.infinity in (s, c):
+                return 1.0
+            return fpu.up(lambda: s/c)
+
+        @monotonic(rd=tanh_rd, ru=tanh_ru)
+        def tanh(c):
+            "Hyberbolic tangent."
+
+        return tanh
+
+    tanh=tanh()
 
     del monotonic
 
