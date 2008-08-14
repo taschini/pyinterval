@@ -351,20 +351,24 @@ class interval(tuple):
             interval([-1.0], [1.0], [2.0])
 
         """
-        def step(x, i):
-            return (x - f(x) / p(i)) & i
         if tracer_cb is None:
             def tracer_cb(tag, interval): pass
+        def step(x, i):
+            return (x - f(x) / p(i)) & i
+        def some(i):
+            yield i.midpoint
+            for x in i.extrema.components:
+                yield x
         def branch(current):
             tracer_cb('branch', current)
             for n in xrange(maxiter):
                 previous = current
-                current = step(current.midpoint, current)
-                tracer_cb('step', current)
-                if previous == current:
-                    splits = [c for c in (step(x, current) for x in self.extrema.components) if c and c != current]
-                    if splits:
-                        return self.union(branch(c) for c in splits[:1])
+                for anchor in some(current):
+                    current = step(anchor, current)
+                    if current != previous:
+                        tracer_cb('step', current)
+                        break
+                else:
                     return current
                 if not current:
                     return current
