@@ -110,8 +110,12 @@ else:
             "Hyberbolic tangent."
 
         return tanh
-
     tanh=tanh()
+
+    def sqrt(x):
+        "Square root."
+        return exp(log(x)/2)
+
 
     del monotonic
 
