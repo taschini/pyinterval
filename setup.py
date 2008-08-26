@@ -34,10 +34,15 @@ class custom_build_py(build_py):
         self.data_files = [fix(*t) for t in self.data_files]
         return build_py.run(self)
 
+# A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: BSD License',
-    'Operating System :: OS Independent',
+    'Operating System :: MacOS :: MacOS X',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: C',
+    'Programming Language :: Python',
     'Topic :: Scientific/Engineering :: Mathematics'
 ]
 
