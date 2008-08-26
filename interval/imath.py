@@ -82,6 +82,12 @@ else:
     pi = 4 * atan(1)
     e = exp(1)
 
+    def sqrt(x):
+        "Square root."
+        return interval.union(
+            interval.hull(exp(log(e)/2).newton(lambda z: z**2 - e, lambda z: 2 * z) for e in c.extrema.components)
+            for c in (x & interval[0, fpu.infinity]).components)
+
     def tanh():
         one_rd = crlibm.log_rd(crlibm.exp_rd(1))
 
@@ -111,11 +117,6 @@ else:
 
         return tanh
     tanh=tanh()
-
-    def sqrt(x):
-        "Square root."
-        return exp(log(x)/2)
-
 
     del monotonic
 
