@@ -118,6 +118,100 @@ else:
         return tanh
     tanh=tanh()
 
+    @interval.function
+    def cospi(c):
+        "cos(pi*x)."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= 2.0:
+            return (-1.0, +1.0),
+        inf = fpu.min(crlibm.cospi_rd(x) for x in c)
+        sup = fpu.max(crlibm.cospi_ru(x) for x in c)
+        # The derivative of cospi is -pi*sinpi. As we are interested in the
+        # derivative sign but not its magnitude, we omit the pi factor.
+        if crlibm.sinpi_rd(c.inf) <= 0 <= crlibm.sinpi_ru(c.sup):
+            return (inf, +1.0),
+        if crlibm.sinpi_ru(c.inf) >= 0 >= crlibm.sinpi_rd(c.sup):
+            return (-1.0, sup),
+        if d >= 1.0:
+            return (-1.0, +1.0),
+        return (inf, sup),
+
+    @interval.function
+    def sinpi(c):
+        "sin(pi*x)."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= 2.0:
+            return (-1.0, +1.0),
+        inf = fpu.min(crlibm.sinpi_rd(x) for x in c)
+        sup = fpu.max(crlibm.sinpi_ru(x) for x in c)
+        # The derivative of sinpi is pi*cospi. As we are interested in the
+        # derivative sign but not its magnitude, we omit the pi factor.
+        if crlibm.cospi_rd(c.inf) <= 0 <= crlibm.cospi_ru(c.sup):
+            return (-1.0, sup),
+        if crlibm.cospi_ru(c.inf) >= 0 >= crlibm.cospi_rd(c.sup):
+            return (inf, +1.0),
+        if d >= 1.0:
+            return (-1.0, +1.0),
+        return (inf, sup),
+
+    @interval.function
+    def tanpi(c):
+        "tan(pi*x)."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= 1.0:
+            return (-fpu.infinity, +fpu.infinity),
+        if 0.0 in cospi(interval.new((c,))):
+            def denan(x, ifnan):
+                return x if x==x else ifnan
+            return (denan(crlibm.tanpi_rd(c.inf), fpu.infinity), fpu.infinity), (-fpu.infinity, denan(crlibm.tanpi_ru(c.sup), -fpu.infinity))
+        else:
+            return (crlibm.tanpi_rd(c.inf), crlibm.tanpi_ru(c.sup)),
+
+    @interval.function
+    def cos(c):
+        "Cosine."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= 2.0 * pi[0].inf:
+            return (-1.0, +1.0),
+        inf = fpu.min(crlibm.cos_rd(x) for x in c)
+        sup = fpu.max(crlibm.cos_ru(x) for x in c)
+        if crlibm.sin_rd(c.inf) <= 0 <= crlibm.sin_ru(c.sup):
+            return (inf, +1.0),
+        if crlibm.sin_ru(c.inf) >= 0 >= crlibm.sin_rd(c.sup):
+            return (-1.0, sup),
+        if d >= pi[0].inf:
+            return (-1.0, +1.0),
+        return (inf, sup),
+
+    @interval.function
+    def sin(c):
+        "Sine."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= 2.0 * pi[0].inf:
+            return (-1.0, +1.0),
+        inf = fpu.min(crlibm.sin_rd(x) for x in c)
+        sup = fpu.max(crlibm.sin_ru(x) for x in c)
+        if crlibm.cos_rd(c.inf) <= 0 <= crlibm.cos_ru(c.sup):
+            return (-1.0, sup),
+        if crlibm.cos_ru(c.inf) >= 0 >= crlibm.cos_rd(c.sup):
+            return (inf, +1.0),
+        if d >= pi[0].inf:
+            return (-1.0, +1.0),
+        return (inf, sup),
+
+    @interval.function
+    def tan(c):
+        "Tangent."
+        d = fpu.up(lambda: c.sup - c.inf)
+        if d != d or d >= pi[0].inf:
+            return (-fpu.infinity, +fpu.infinity),
+        if 0.0 in cos(interval.new((c,))):
+            def denan(x, ifnan):
+                return x if x==x else ifnan
+            return (denan(crlibm.tan_rd(c.inf), fpu.infinity), fpu.infinity), (-fpu.infinity, denan(crlibm.tan_ru(c.sup), -fpu.infinity))
+        else:
+            return (crlibm.tan_rd(c.inf), crlibm.tan_ru(c.sup)),
+
     del monotonic
 
 if __name__  == '__main__':
