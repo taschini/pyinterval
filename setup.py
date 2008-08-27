@@ -56,7 +56,7 @@ metadata = dict(
 
 setup(
     name         = 'pyinterval',
-    version      = '1.0b14',
+    version      = '1.0b21',
     packages     = ['interval'],
     package_data = dict(interval=['../LICENSE']),
     cmdclass     = dict(build_py=custom_build_py),
