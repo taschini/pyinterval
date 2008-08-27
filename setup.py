@@ -22,11 +22,10 @@ Create a source distribution:
 """
 
 
-from distutils.core import setup, Extension
 try:
-    from setuptools import setup
+    from setuptools import setup, Extension
 except ImportError:
-    pass
+    from distutils.core import setup, Extension
 from distutils.command.build_py import build_py
 
 class custom_build_py(build_py):
