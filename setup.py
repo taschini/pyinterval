@@ -53,7 +53,7 @@ metadata = dict(
     description  = 'Interval arithmetic in Python',
     author       = 'Stefano Taschini',
     author_email = 'taschini@gmail.com',
-    url          = "http://pyinterval.googlecode.com/",
+    url          = "https://github.com/taschini/pyinterval",
     classifiers  = classifiers
 );
 
