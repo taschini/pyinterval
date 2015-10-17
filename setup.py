@@ -57,6 +57,39 @@ metadata = dict(
     classifiers  = classifiers
 );
 
+description="""
+This library provides a Python implementation of an algebraically
+closed interval system on the extended real number set. An interval
+object consists of a finite union of closed, possibly unbound,
+mathematical intervals.
+
+Installation
+------------
+
+The most convenient way to install this library is by means of `easy_install`_::
+
+    easy_install pyinterval
+
+Alternatively, it is possible to download the sources from PyPI_ and invoking ::
+
+    python setup.py install
+
+in the unpacked directory. Note that you need the crlibm_ library
+installed on your system. It is also possible to retrieve the source code
+from the GitHub `repository`_.
+
+.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _pypi: http://pypi.python.org/pypi/pyinterval/
+.. _crlibm: http://lipforge.ens-lyon.fr/www/crlibm/
+.. _repository: https://github.com/taschini/pyinterval
+
+Documentation
+-------------
+
+Full documentation is available at
+http://cdn.rawgit.com/taschini/pyinterval/master/html/index.html
+"""
+
 setup(
     name         = 'pyinterval',
     version      = '1.0b21',
@@ -71,4 +104,5 @@ setup(
             library_dirs = ['/opt/crlibm/lib'],
             libraries    = ['crlibm'])
         ],
+    long_description = description,
     **metadata)
