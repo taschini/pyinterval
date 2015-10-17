@@ -1,6 +1,8 @@
 PyInterval
 ==========
 
+[![Build Status](https://travis-ci.org/taschini/pyinterval.svg?branch=master)](https://travis-ci.org/taschini/pyinterval)
+
 This library provides a Python implementation of an algebraically
 closed interval system on the extended real number set. An interval
 object consists of a finite union of closed, possibly unbound,

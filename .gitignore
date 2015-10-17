@@ -1,0 +1,6 @@
+build/
+/dist/
+deps/crlibm*
+*.pyc
+*.egg-info/
+/crlibm.so

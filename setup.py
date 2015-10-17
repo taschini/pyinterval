@@ -100,8 +100,8 @@ setup(
         Extension(
             'crlibm',
             sources      = ['ext/crlibmmodule.c'],
-            include_dirs = ['/opt/crlibm/include'],
-            library_dirs = ['/opt/crlibm/lib'],
+            include_dirs = ['deps/build/include'],
+            library_dirs = ['deps/build/lib'],
             libraries    = ['crlibm'])
         ],
     long_description = description,
