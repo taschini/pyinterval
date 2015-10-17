@@ -79,9 +79,13 @@ class ModuleTestCase(unittest.TestCase):
 
     def test_namespace(self):
         import interval
+        expected = ['__builtins__', '__doc__', '__file__', '__name__', '__package__', '__path__', 'fpu', 'imath', 'inf', 'interval']
+        # Version of Python <= 2.5 do not necessarily have a '__package__'
+        if '__package__' not in globals():
+            expected.remove('__package__')
         self.assertEqual(
             dir(interval),
-            ['__builtins__', '__doc__', '__file__', '__name__', '__path__', 'fpu', 'imath', 'inf', 'interval'])
+            expected)
 
 
 class IntervalTestCase(unittest.TestCase):
