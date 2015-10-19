@@ -27,6 +27,7 @@ try:
 except ImportError:
     from distutils.core import setup, Extension
 from distutils.command.build_py import build_py
+from distutils.command.build_ext import build_ext
 
 class custom_build_py(build_py):
     def run(self):
@@ -36,6 +37,23 @@ class custom_build_py(build_py):
             return (package, '.', build_dir, ['LICENSE'])
         self.data_files = [fix(*t) for t in self.data_files]
         return build_py.run(self)
+
+class custom_build_ext(build_ext):
+    """Build C/C++ extensions, without aborting in case of failure."""
+
+    def run(self):
+        try:
+            build_ext.run(self)
+        except Exception as ex:
+            import sys
+            sys.stderr.write("*** Could not build any of the extensions: {!r}\n*** Skipping...\n".format(ex))
+
+    def build_extension(self, ext):
+        try:
+            build_ext.build_extension(self, ext)
+        except Exception as ex:
+            import sys
+            sys.stderr.write("*** Could not build the extension {!r}: {!r}\n*** Skipping...\n".format(ext.name, ex))
 
 # A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
@@ -95,7 +113,7 @@ setup(
     version      = '1.0b21',
     packages     = ['interval'],
     package_data = dict(interval=['../LICENSE']),
-    cmdclass     = dict(build_py=custom_build_py),
+    cmdclass     = dict(build_py=custom_build_py, build_ext=custom_build_ext),
     ext_modules  = [
         Extension(
             'crlibm',
