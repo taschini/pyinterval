@@ -5,6 +5,10 @@ PyInterval
    :target: https://travis-ci.org/taschini/pyinterval
    :alt: Travis CI build status (Linux)
 
+.. image:: https://img.shields.io/appveyor/ci/taschini/pyinterval/master.svg?label=Windows%20build
+   :target: https://ci.appveyor.com/project/taschini/pyinterval
+   :alt: AppVeyor CI build status (Windows)
+
 .. image:: https://img.shields.io/pypi/v/pyinterval.svg
    :target: https://pypi.python.org/pypi/pyinterval/
    :alt: Latest PyPI version
