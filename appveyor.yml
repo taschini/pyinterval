@@ -1,11 +1,5 @@
 environment:
 
-  global:
-    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
-    # /E:ON and /V:ON options are not enabled in the batch script intepreter
-    # See: http://stackoverflow.com/a/13751649/163740
-    WITH_COMPILER: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_compiler.cmd"
-
   matrix:
 
     # Pre-installed Python versions, which Appveyor may upgrade to
@@ -15,25 +9,29 @@ environment:
     - PYTHON: "C:\\Python27"
       PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "32"
+      PYTHON_DLL: "C:\\Windows\\SysWOW64\\python27.dll"
+      WITH_COMPILER: "PATH C:\\msys64\\MINGW32\\bin;C:\\msys64\\usr\\bin;%PATH% &"
 
     - PYTHON: "C:\\Python27-x64"
       PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "64"
-      WINDOWS_SDK_VERSION: "v7.0"
+      PYTHON_DLL: "C:\\Windows\\System32\\python27.dll"
+      WITH_COMPILER: "PATH C:\\msys64\\MINGW64\\bin;C:\\msys64\\usr\\bin;%PATH% &"
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 install:
   - "powershell appveyor\\install.ps1"
+  - ".\\appveyor\\install_crlibm.bat"
 
 build: off
 
 test_script:
-  - "%WITH_COMPILER% %PYTHON%/python setup.py test"
+  - "%PYTHON%/python runtests.py"
 
 after_test:
-  - "%WITH_COMPILER% %PYTHON%/python setup.py bdist_wheel"
+  - "%WITH_COMPILER% %PYTHON%/python setup.py build_ext -c msys2 bdist_wheel"
 
 artifacts:
   - path: dist\*
