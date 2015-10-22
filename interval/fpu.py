@@ -2,17 +2,21 @@
 # All rights reserved.
 # See LICENSE for details.
 
-"""Floating-point unit control and helper functions.
+"""\
+``interval.fpu`` --- FPU control and helper functions
+-----------------------------------------------------
 
 This module provides:
 
-  1. Mechanisms for the control of the FPU's rounding modes;
+  1. Mechanisms for the control of the rounding modes of the
+     floating-point unit (FPU);
 
   2. Helper functions that respect IEEE 754 semantics.
 
 Limitations
     The current implementation of the FPU's rounding-mode control is
     thought to be not thread-safe.
+
 """
 
 from __builtin__ import float

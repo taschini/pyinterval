@@ -2,7 +2,9 @@
 # All rights reserved.
 # See LICENSE for details.
 
-"""An algebraically closed interval system on the extended real set.
+"""\
+``interval`` --- Interval arithmetic
+------------------------------------
 
 This package provides the interval class, which is usually imported
 into the current namespace:

@@ -2,7 +2,9 @@
 # All rights reserved.
 # See LICENSE for details.
 
-"""Mathematical function library for intervals.
+"""\
+``interval.imath`` --- Mathematical functions for intervals
+-----------------------------------------------------------
 
 This module provides transcendental functions with interval argument.
 """
