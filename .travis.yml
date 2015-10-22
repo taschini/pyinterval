@@ -7,3 +7,6 @@ install:
     - python setup.py build_ext -i
 script:
     - ./runtests.py
+branches:
+    except:
+        - doc
