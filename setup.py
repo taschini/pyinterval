@@ -21,6 +21,7 @@ Create a source distribution:
 
 """
 
+version = '1.0.0'
 
 try:
     from setuptools import setup, Extension
@@ -98,13 +99,16 @@ class custom_build_ext(build_ext):
 
 # A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'License :: OSI Approved :: BSD License',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: Microsoft :: Windows',
     'Operating System :: POSIX :: Linux',
     'Programming Language :: C',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Scientific/Engineering :: Mathematics'
 ]
 
@@ -118,13 +122,16 @@ metadata = dict(
     author_email     = 'taschini@gmail.com',
     classifiers      = classifiers,
     description      = 'Interval arithmetic in Python',
+    license          = 'BSD',
     long_description = long_description,
+    platforms        = '',
+    download_url     = "https://github.com/taschini/pyinterval/archive/{}.tar.gz".format(version),
     url              = "https://github.com/taschini/pyinterval",
 );
 
 data = dict(
     name          = 'pyinterval',
-    version       = '1.0.0',
+    version       = version,
     packages      = ['interval'],
     package_data  = dict(interval=['../LICENSE']),
     cmdclass      = dict(build_py=custom_build_py, build_ext=custom_build_ext),
