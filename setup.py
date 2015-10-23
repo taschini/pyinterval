@@ -74,6 +74,10 @@ class custom_build_py(build_py):
 class custom_build_ext(build_ext):
     """Build C/C++ extensions, without aborting in case of failure."""
 
+    def make_dependencies(self):
+        import subprocess as sub
+        sub.call('make -C deps'.split())
+
     def run(self):
         try:
             build_ext.run(self)
@@ -82,11 +86,15 @@ class custom_build_ext(build_ext):
             sys.stderr.write("*** Could not build any of the extensions: {!r}\n*** Skipping...\n".format(ex))
 
     def build_extension(self, ext):
-        try:
-            build_ext.build_extension(self, ext)
-        except Exception as ex:
-            import sys
-            sys.stderr.write("*** Could not build the extension {!r}: {!r}\n*** Skipping...\n".format(ext.name, ex))
+        for attempt in range(2):
+            try:
+                return build_ext.build_extension(self, ext)
+            except Exception as ex:
+                if attempt == 0:
+                    self.make_dependencies()
+        import sys
+        sys.stderr.write("*** Could not build the extension {!r}: {!r}\n*** Skipping...\n".format(ext.name, ex))
+
 
 # A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
