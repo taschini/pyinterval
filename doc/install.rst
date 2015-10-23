@@ -50,3 +50,9 @@ Finally, you can compile and install PyInterval::
     %PYTHON%\python setup.py install
 
 .. _pypi: http://pypi.python.org/pypi/pyinterval/
+
+Semantic Versioning
+-------------------
+
+Starting with version 1.0.0, this project follows a `semantic
+versioning <http://semver.org/>`_ scheme.
