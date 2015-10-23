@@ -64,7 +64,7 @@ def register_msys2ccompiler():
 class custom_build_py(build_py):
     # Copy the license file into the package directory
     def run(self):
-	from os import path as op
+        from os import path as op
         def fix(package, src_dir, build_dir, filenames):
             assert filenames == [op.join('..', 'LICENSE')]
             return (package, '.', build_dir, ['LICENSE'])
@@ -100,26 +100,28 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Mathematics'
 ]
 
-metadata = dict(
-    description  = 'Interval arithmetic in Python',
-    author       = 'Stefano Taschini',
-    author_email = 'taschini@gmail.com',
-    url          = "https://github.com/taschini/pyinterval",
-    classifiers  = classifiers
-);
-
 @apply
 def long_description():
     with open('README.rst') as f:
         return f.read().decode('utf8')
 
+metadata = dict(
+    author           = 'Stefano Taschini',
+    author_email     = 'taschini@gmail.com',
+    classifiers      = classifiers,
+    description      = 'Interval arithmetic in Python',
+    long_description = long_description,
+    url              = "https://github.com/taschini/pyinterval",
+);
+
 data = dict(
-    name         = 'pyinterval',
-    version      = '1.0b21',
-    packages     = ['interval'],
-    package_data = dict(interval=['../LICENSE']),
-    cmdclass     = dict(build_py=custom_build_py, build_ext=custom_build_ext),
-    ext_modules  = [
+    name          = 'pyinterval',
+    version       = '1.0b21',
+    packages      = ['interval'],
+    package_data  = dict(interval=['../LICENSE']),
+    cmdclass      = dict(build_py=custom_build_py, build_ext=custom_build_ext),
+    test_suite    = 'test',
+    ext_modules   = [
         Extension(
             'crlibm',
             sources      = ['ext/crlibmmodule.c'],
@@ -127,7 +129,6 @@ data = dict(
             library_dirs = ['deps/build/lib'],
             libraries    = ['crlibm'])
         ],
-    long_description = long_description,
     **metadata)
 
 if __name__ == '__main__':
