@@ -1,0 +1,2 @@
+include deps/Makefile
+include test/*.py

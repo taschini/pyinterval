@@ -1,6 +1,0 @@
-LICENSE
-setup.py
-ext/crlibmmodule.c
-interval/__init__.py
-interval/fpu.py
-interval/imath.py
