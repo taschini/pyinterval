@@ -1,5 +1,5 @@
 PyInterval — Interval Arithmetic in Python
-=============================================
+==========================================
 
 .. container:: badges
 
@@ -22,7 +22,7 @@ PyInterval — Interval Arithmetic in Python
 This library provides a Python implementation of an algebraically
 closed interval system on the extended real number set. Interval
 objects, as defined in this library, consist of a finite union of closed,
-possibly unbound, intervals in the mathematical sense.
+possibly unbound intervals in the mathematical sense.
 
 Links
 -----
