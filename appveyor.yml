@@ -32,7 +32,7 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%/python runtests.py"
+  - "%WITH_COMPILER% %PYTHON%/python setup.py test -q"
 
 after_test:
   - "%WITH_COMPILER% %PYTHON%/python setup.py build_ext -c msys2 bdist_wheel"

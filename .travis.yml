@@ -6,7 +6,7 @@ install:
     - make -C deps
     - python setup.py build_ext -i
 script:
-    - ./runtests.py
+    - python setup.py test -q
 branches:
     except:
         - doc

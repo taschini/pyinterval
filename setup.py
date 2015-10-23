@@ -29,7 +29,6 @@ except ImportError:
 from distutils.command.build_py import build_py
 from distutils.command.build_ext import build_ext
 from distutils import cygwinccompiler
-from distutils.ccompiler import compiler_class
 
 class Msys2CCompiler (cygwinccompiler.CygwinCCompiler):
     # From https://github.com/aleaxit/gmpy/blob/ff2a8cca8e6f6901aa8ebb7e56a5fb19b236aaf0/msys2_build.txt
@@ -55,12 +54,17 @@ class Msys2CCompiler (cygwinccompiler.CygwinCCompiler):
                              linker_so='%s %s %s' % (self.linker_dll, shared_option, entry_point))
         self.dll_libraries=[]
 
-cygwinccompiler.Msys2CCompiler = Msys2CCompiler
-compiler_class['msys2'] = ('cygwinccompiler', 'Msys2CCompiler', "MSYS2/MinGW-w64 port of GNU C Compiler for MS Windows")
+@apply
+def register_msys2ccompiler():
+    from distutils.ccompiler import compiler_class
+    cygwinccompiler.Msys2CCompiler = Msys2CCompiler
+    compiler_class['msys2'] = ('cygwinccompiler', 'Msys2CCompiler', "MSYS2/MinGW-w64 port of GNU C Compiler for MS Windows")
+    return 'Done'
 
 class custom_build_py(build_py):
+    # Copy the license file into the package directory
     def run(self):
-	from os import path as op
+        from os import path as op
         def fix(package, src_dir, build_dir, filenames):
             assert filenames == [op.join('..', 'LICENSE')]
             return (package, '.', build_dir, ['LICENSE'])
@@ -96,54 +100,28 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Mathematics'
 ]
 
+@apply
+def long_description():
+    with open('README.rst') as f:
+        return f.read().decode('utf8')
+
 metadata = dict(
-    description  = 'Interval arithmetic in Python',
-    author       = 'Stefano Taschini',
-    author_email = 'taschini@gmail.com',
-    url          = "https://github.com/taschini/pyinterval",
-    classifiers  = classifiers
+    author           = 'Stefano Taschini',
+    author_email     = 'taschini@gmail.com',
+    classifiers      = classifiers,
+    description      = 'Interval arithmetic in Python',
+    long_description = long_description,
+    url              = "https://github.com/taschini/pyinterval",
 );
 
-description="""
-This library provides a Python implementation of an algebraically
-closed interval system on the extended real number set. An interval
-object consists of a finite union of closed, possibly unbound,
-mathematical intervals.
-
-Installation
-------------
-
-The most convenient way to install this library is by means of `easy_install`_::
-
-    easy_install pyinterval
-
-Alternatively, it is possible to download the sources from PyPI_ and invoking ::
-
-    python setup.py install
-
-in the unpacked directory. Note that you need the crlibm_ library
-installed on your system. It is also possible to retrieve the source code
-from the GitHub `repository`_.
-
-.. _easy_install: http://peak.telecommunity.com/DevCenter/EasyInstall
-.. _pypi: http://pypi.python.org/pypi/pyinterval/
-.. _crlibm: http://lipforge.ens-lyon.fr/www/crlibm/
-.. _repository: https://github.com/taschini/pyinterval
-
-Documentation
--------------
-
-Full documentation is available at
-http://cdn.rawgit.com/taschini/pyinterval/master/html/index.html
-"""
-
-setup(
-    name         = 'pyinterval',
-    version      = '1.0b21',
-    packages     = ['interval'],
-    package_data = dict(interval=['../LICENSE']),
-    cmdclass     = dict(build_py=custom_build_py, build_ext=custom_build_ext),
-    ext_modules  = [
+data = dict(
+    name          = 'pyinterval',
+    version       = '1.0b21',
+    packages      = ['interval'],
+    package_data  = dict(interval=['../LICENSE']),
+    cmdclass      = dict(build_py=custom_build_py, build_ext=custom_build_ext),
+    test_suite    = 'test',
+    ext_modules   = [
         Extension(
             'crlibm',
             sources      = ['ext/crlibmmodule.c'],
@@ -151,5 +129,7 @@ setup(
             library_dirs = ['deps/build/lib'],
             libraries    = ['crlibm'])
         ],
-    long_description = description,
     **metadata)
+
+if __name__ == '__main__':
+    setup(**data)
