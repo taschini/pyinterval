@@ -6,8 +6,8 @@ build: crlibm
 
 msys2: crlibm
 	# Download most recent config support scripts, which know of msys:
-	curl -Sso crlibm/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
-	curl -Sso crlibm/config.sub   'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'
+	curl -fLSso crlibm/config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+	curl -fLSso crlibm/config.sub   'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'
 	# Pretend that msys is a BSD-type OS.
 	perl -plwe 's/netbsd/netbsd*|msys/' -i.bak $</configure
 	# Configure needs a working stdin, which is normally hijacked by appevyor:
@@ -21,7 +21,7 @@ crlibm: crlibm.tar.gz
 	tar xzf $< -C $@ --strip-components=1
 
 crlibm.tar.gz:
-	curl -sSo $@ http://lipforge.ens-lyon.fr/frs/download.php/162/crlibm-1.0beta4.tar.gz
+	curl -fLsSo $@ http://lipforge.ens-lyon.fr/frs/download.php/162/crlibm-1.0beta4.tar.gz
 
 clean:
 	-rm -rf build crlibm
