@@ -229,6 +229,3 @@ class ImathTestcase(unittest.TestCase):
 
 def within(x, y, d):
     return y in x and all(c < d for c in helpers.ulpwidth(x))
-
-if __name__ == '__main__':
-    unittest.main()

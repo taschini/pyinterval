@@ -86,7 +86,3 @@ def issharp(x):
 
     """
     return not x or max(ulpwidth(x)) <= 1
-
-if __name__  == '__main__':
-    import doctest
-    doctest.testmod()

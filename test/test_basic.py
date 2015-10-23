@@ -267,7 +267,3 @@ class NewtonTestCase(unittest.TestCase):
         self.assertEqual(interval(), interval[2, 5].newton(f, p))
         self.assertEqual(-s, interval[-5, 0].newton(f, p))
         self.assertEqual(-s|s, interval[-5, +5].newton(f, p))
-
-
-if __name__ == '__main__':
-    unittest.main()
