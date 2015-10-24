@@ -1,2 +1,3 @@
 include deps/Makefile
+include deps/crlibm.tar.gz
 include test/*.py
