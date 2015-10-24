@@ -84,7 +84,7 @@ class custom_build_ext(build_ext):
             build_ext.run(self)
         except Exception as ex:
             import sys
-            sys.stderr.write("*** Could not build any of the extensions: {!r}\n*** Skipping...\n".format(ex))
+            sys.stderr.write("*** Could not build any of the extensions: {0!r}\n*** Skipping...\n".format(ex))
 
     def build_extension(self, ext):
         for attempt in range(2):
@@ -94,7 +94,7 @@ class custom_build_ext(build_ext):
                 if attempt == 0:
                     self.make_dependencies()
         import sys
-        sys.stderr.write("*** Could not build the extension {!r}: {!r}\n*** Skipping...\n".format(ext.name, ex))
+        sys.stderr.write("*** Could not build the extension {0!r}: {1!r}\n*** Skipping...\n".format(ext.name, ex))
 
 
 # A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -125,7 +125,6 @@ metadata = dict(
     license          = 'BSD',
     long_description = long_description,
     platforms        = '',
-    download_url     = "https://github.com/taschini/pyinterval/archive/{}.tar.gz".format(version),
     url              = "https://github.com/taschini/pyinterval",
 );
 
