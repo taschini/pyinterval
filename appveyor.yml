@@ -27,7 +27,6 @@ init:
 
 install:
   - "powershell appveyor\\install.ps1"
-  - ".\\appveyor\\install_crlibm.bat"
 
 build: off
 
@@ -35,7 +34,7 @@ test_script:
   - "%WITH_COMPILER% %PYTHON%/python setup.py test -q"
 
 after_test:
-  - "%WITH_COMPILER% %PYTHON%/python setup.py build_ext -c msys2 bdist_wheel"
+  - "%WITH_COMPILER% %PYTHON%/python setup.py bdist_wheel"
 
 artifacts:
   - path: dist\*

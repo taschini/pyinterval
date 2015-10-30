@@ -67,19 +67,15 @@ function InstallPip ($python_home) {
         Write-Host "Executing:" $python_path $GET_PIP_PATH
         Start-Process -FilePath "$python_path" -ArgumentList "$GET_PIP_PATH" -Wait -Passthru
     } else {
-        Write-Host "pip already installed."
+        & $python_path -m pip install -U pip setuptools wheel
     }
-}
-
-function InstallPackage ($python_home, $pkg) {
-    $pip_path = $python_home + "/Scripts/pip.exe"
-    & $pip_path install $pkg
 }
 
 function main () {
     InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     InstallPip $env:PYTHON
-    InstallPackage $env:PYTHON wheel
+    $pip = $env:PYTHON + "/Scripts/pip.exe"
+    & $pip install -e .
 }
 
 main
