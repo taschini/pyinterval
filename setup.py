@@ -1,53 +1,60 @@
 #! /usr/bin/env python
 
-# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2016 Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
-version = '1.0.1.dev0'
+from setuptools import setup
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
 
-# A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
-classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'License :: OSI Approved :: BSD License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Topic :: Scientific/Engineering :: Mathematics'
-]
+def read_long_description():
+    import io
+    parts = []
+    for filename in 'README.rst', 'CHANGES.rst':
+        with io.open(filename, encoding='utf-8') as f:
+            parts.append(f.read())
+    return '\n'.join(parts)
 
-@apply
-def long_description():
-    with open('README.rst') as f:
-        return f.read().decode('utf8')
 
 metadata = dict(
     author           = 'Stefano Taschini',
     author_email     = 'taschini@gmail.com',
-    classifiers      = classifiers,
     description      = 'Interval arithmetic in Python',
+    install_requires = ['crlibm>=1.0.2,==1.*'],
+    keywords         = 'interval crlibm',
     license          = 'BSD',
-    long_description = long_description,
-    platforms        = '',
-    url              = "https://github.com/taschini/pyinterval",
-);
-
-data                 = dict(
+    long_description = read_long_description(),
     name             = 'pyinterval',
-    version          = version,
-    packages         = ['interval'],
     package_data     = dict(interval=['LICENSE']),
-    # install_requires = ['crlibm~=1.0'],  this is till too new to be broadly supported.
-    install_requires = ['crlibm>=1.0,==1'],
+    packages         = ['interval'],
+    platforms        = '',
     test_suite       = 'test',
     tests_require    = [],
-    **metadata)
+    url              = "https://github.com/taschini/pyinterval",
+    version          = '1.0.1.dev0',
+    zip_safe         = False,
+    extras_require   = {
+        'develop': [
+            'Sphinx',
+            'flake8',
+            'tox',
+            'zest.releaser[recommended]',
+        ]
+    },
+    classifiers      = [
+        # A subset of http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Scientific/Engineering :: Mathematics'
+    ],
+)
 
 if __name__ == '__main__':
-    setup(**data)
+    setup(**metadata)
