@@ -1,4 +1,4 @@
-# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2016, Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
@@ -21,6 +21,7 @@ inf = fpu.infinity
 
 def coercing(f):
     from functools import wraps
+
     @wraps(f)
     def wrapper(self, other):
         try:
@@ -32,10 +33,14 @@ def coercing(f):
 
 def comp_by_comp(f):
     from functools import wraps
+
     @wraps(f)
     def wrapper(self, other):
         try:
-            return self._canonical(self.Component(*f(x, y)) for x in self for y in self.cast(other))
+            return self._canonical(
+                self.Component(*f(x, y))
+                for x in self
+                for y in self.cast(other))
         except self.ScalarError:
             return NotImplemented
     return wrapper
@@ -44,16 +49,6 @@ def comp_by_comp(f):
 class Metaclass(type):
     def __getitem__(self, arg):
         return self(arg)
-
-    def reload(self):
-        import sys, __main__
-        module = reload(sys.modules[self.__module__])
-        if __main__.interval == self:
-            __main__.interval = module.interval
-
-    def add_method(self, f):
-        setattr(self, f.__name__, f)
-        return f
 
 
 class interval(tuple):
@@ -92,11 +87,13 @@ class interval(tuple):
     def __new__(cls, *args):
         if len(args) == 1 and isinstance(args[0], cls):
             return args[0]
+
         def make_component(x, y=None):
             if y is None:
                 return cls.cast(x)
             else:
                 return cls.hull((cls.cast(x), cls.cast(y)))
+
         def process(x):
             try:
                 return make_component(*x if hasattr(x, '__iter__') else (x,))
@@ -153,9 +150,13 @@ class interval(tuple):
         """
 
         from functools import wraps
+
         @wraps(f)
         def wrapper(x):
-            return cls._canonical(cls.Component(*t) for c in cls.cast(x) for t in f(c))
+            return cls._canonical(
+                cls.Component(*t)
+                for c in cls.cast(x)
+                for t in f(c))
         return wrapper
 
     @classmethod
@@ -308,14 +309,11 @@ class interval(tuple):
     def __contains__(self, other):
         return all(any(x.inf <= y.inf and y.sup <= x.sup for x in self) for y in other)
 
-
     class ComponentError(ValueError):
         pass
 
-
     class ScalarError(ValueError):
         pass
-
 
     class Component(tuple):
 
@@ -340,7 +338,6 @@ class interval(tuple):
         def sup_inv(self):
             return fpu.down(lambda: 1 / self.sup)
 
-
     def newton(self, f, p, maxiter=10000, tracer_cb=None):
         """Find the roots of f(x) (where p=df/dx) within self using Newton-Raphson.
 
@@ -355,12 +352,15 @@ class interval(tuple):
         """
         if tracer_cb is None:
             def tracer_cb(tag, interval): pass
+
         def step(x, i):
             return (x - f(x) / p(i)) & i
+
         def some(i):
             yield i.midpoint
             for x in i.extrema.components:
                 yield x
+
         def branch(current):
             tracer_cb('branch', current)
             for n in xrange(maxiter):
@@ -378,15 +378,9 @@ class interval(tuple):
                     return self.union(branch(c) for c in current.components)
             tracer_cb("abandon", current)
             return self.new(())
+
         return self.union(branch(c) for c in self.components)
 
-
-def setup():
-    # The decorator interval.function can only be used from outside
-    # the original class scope.
-
-    @interval.add_method
-    @interval.function
     def inverse(c):
         """Return self ** -1, or, equivalently, 1 / self."""
         if c.inf <= 0 <= c.sup:
@@ -394,9 +388,14 @@ def setup():
                     (c.sup_inv if c.sup != 0 else +fpu.infinity, +fpu.infinity))
         else:
             return (c.sup_inv, c.inf_inv),
-setup()
+
+
+# The decorator interval.function can only be used from outside
+# the original class scope.
+interval.inverse = interval.function(getattr(interval.inverse, '__func__', interval.inverse))
+
 
 # Clean up the namespace
-del coercing, comp_by_comp, setup, Metaclass
+del coercing, comp_by_comp, Metaclass
 
-from . import imath
+from . import imath  # noqa
