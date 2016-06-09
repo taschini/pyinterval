@@ -1,4 +1,4 @@
-# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2016, Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
@@ -19,10 +19,10 @@ Limitations
 
 """
 
-from __builtin__ import float
+float = float
 
 
-def _init_libm():
+def _init_libm():  # pragma: nocover
     "Initialize low-level FPU control using C99 primitives in libm."
     global _fe_upward, _fe_downward, _fegetround, _fesetround
 
@@ -41,7 +41,7 @@ def _init_libm():
     _fegetround, _fesetround = libm.fegetround, libm.fesetround
 
 
-def _init_msvc():
+def _init_msvc():  # pragma: nocover
     "Initialize low-level FPU control using the Microsoft VC runtime."
     global _fe_upward, _fe_downward, setup, _fegetround, _fesetround
 
@@ -49,34 +49,40 @@ def _init_msvc():
     global _controlfp
     _controlfp = cdll.msvcrt._controlfp
     _fe_upward, _fe_downward = 0x0200, 0x0100
+
     def _fegetround():
         return _controlfp(0, 0)
+
     def _fesetround(flag):
         _controlfp(flag, 0x300)
 
 
-for _f in _init_libm, _init_msvc:
-    try:
-        _f()
-        break
-    except:
-        pass
-else:
-    import warnings
-    warnings.warn("Cannot determine FPU control primitives. The fpu module is not correcly initialized.", stacklevel=2)
-try:
-    del _f
-except:
-    pass
+def _init():  # pragma: nocover
+    "Initialize low-level FPU control using the appropriate library."
+
+    for f in _init_libm, _init_msvc:
+        try:
+            f()
+        except:
+            pass
+        else:
+            break
+    else:
+        import warnings
+        warnings.warn(
+            "Cannot determine FPU control primitives. "
+            "The fpu module is not correcly initialized.",
+            stacklevel=2)
+_init()
 
 
 def infinity():
     global infinity, nan
     try:
         infinity = float('inf')
-    except:
+    except:  # pragma: nocover; useful only for Python < 2.6
         import struct
-        infinity = struct.unpack('!d','\x7f\xf0\x00\x00\x00\x00\x00\x00')[0]
+        infinity = struct.unpack('!d', b'\x7f\xf0\x00\x00\x00\x00\x00\x00')[0]
     nan = infinity / infinity
 infinity()
 
@@ -139,10 +145,10 @@ def max(l):
 def power_rn(x, n):
     "Raise x to the n-th power (with n positive integer), rounded to nearest."
     assert isinstance(n, (int, long)) and n >= 0
-    l=();
+    l = ()
     while n > 0:
-        n, y= divmod(n, 2)
-        l=(y, l)
+        n, y = divmod(n, 2)
+        l = (y, l)
     result = 1.0
     while l:
         y, l = l
