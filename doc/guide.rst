@@ -63,7 +63,7 @@ multiplied::
 
 divided::
 
-    >>> print (interval[1]/interval[3]).format('%.17f')
+    >>> print((interval[1]/interval[3]).format('%.17f'))
     interval([0.33333333333333331, 0.33333333333333337])
 
 inersected::
