@@ -1,3 +1,5 @@
+shallow_clone: true
+
 branches:
   except:
     - doc
@@ -13,13 +15,21 @@ environment:
     - PYTHON: "C:\\Python27"
       PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "32"
-      PYTHON_DLL: "C:\\Windows\\SysWOW64\\python27.dll"
       WITH_COMPILER: "PATH C:\\msys64\\MINGW32\\bin;C:\\msys64\\usr\\bin;%PATH% &"
 
     - PYTHON: "C:\\Python27-x64"
       PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "64"
-      PYTHON_DLL: "C:\\Windows\\System32\\python27.dll"
+      WITH_COMPILER: "PATH C:\\msys64\\MINGW64\\bin;C:\\msys64\\usr\\bin;%PATH% &"
+
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "32"
+      WITH_COMPILER: "PATH C:\\msys64\\MINGW32\\bin;C:\\msys64\\usr\\bin;%PATH% &"
+
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "64"
       WITH_COMPILER: "PATH C:\\msys64\\MINGW64\\bin;C:\\msys64\\usr\\bin;%PATH% &"
 
 init:
