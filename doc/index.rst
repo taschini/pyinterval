@@ -9,7 +9,8 @@ Contents
    install
    guide
    api
-
+   history
+   license
 
 
 Indices and tables
