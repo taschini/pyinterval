@@ -1,4 +1,4 @@
-# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2016, Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
@@ -13,7 +13,8 @@ try:
     import crlibm
 except ImportError:
     import sys
-    sys.stderr.write("Cannot load crlibm extension. The imath functions will not be available.\n")
+    sys.stderr.write("Cannot load crlibm extension. "
+                     "The imath functions will not be available.\n")
     del sys
 else:
 
@@ -29,10 +30,12 @@ else:
             from functools import wraps
             self.rd = self.rd or getattr(crlibm, f.__name__ + '_rd')
             self.ru = self.ru or getattr(crlibm, f.__name__ + '_ru')
+
             @wraps(f)
             def wrapper(x):
-                return interval._canonical(type(c)(self.rd(c.inf), self.ru(c.sup))
-                                           for c in interval.cast(x) & self.domain)
+                return interval._canonical(
+                    type(c)(self.rd(c.inf), self.ru(c.sup))
+                    for c in interval.cast(x) & self.domain)
             return wrapper
 
     @monotonic()
@@ -43,19 +46,19 @@ else:
     def expm1(x):
         "exp(x) - 1."
 
-    @monotonic(domain = interval[0, fpu.infinity])
+    @monotonic(domain=interval[0, fpu.infinity])
     def log(x):
         "Natural logarithm."
 
-    @monotonic(domain = interval[0, fpu.infinity])
+    @monotonic(domain=interval[0, fpu.infinity])
     def log2(x):
         "Logarithm in base 2."
 
-    @monotonic(domain = interval[0, fpu.infinity])
+    @monotonic(domain=interval[0, fpu.infinity])
     def log10(x):
         "Logarithm in base 10."
 
-    @monotonic(domain = interval[-1, fpu.infinity])
+    @monotonic(domain=interval[-1, fpu.infinity])
     def log1p(x):
         "log(1+x)."
 
@@ -87,7 +90,9 @@ else:
     def sqrt(x):
         "Square root."
         return interval.union(
-            interval.hull(exp(log(e)/2).newton(lambda z: z**2 - e, lambda z: 2 * z) for e in c.extrema.components)
+            interval.hull(
+                exp(log(e)/2).newton(lambda z: z**2 - e, lambda z: 2 * z)
+                for e in c.extrema.components)
             for c in (x & interval[0, fpu.infinity]).components)
 
     def tanh():
@@ -118,7 +123,7 @@ else:
             "Hyberbolic tangent."
 
         return tanh
-    tanh=tanh()
+    tanh = tanh()
 
     @interval.function
     def cospi(c):
@@ -164,8 +169,10 @@ else:
             return (-fpu.infinity, +fpu.infinity),
         if 0.0 in cospi(interval.new((c,))):
             def denan(x, ifnan):
-                return x if x==x else ifnan
-            return (denan(crlibm.tanpi_rd(c.inf), fpu.infinity), fpu.infinity), (-fpu.infinity, denan(crlibm.tanpi_ru(c.sup), -fpu.infinity))
+                return x if x == x else ifnan
+            return (
+                (denan(crlibm.tanpi_rd(c.inf), fpu.infinity), fpu.infinity),
+                (-fpu.infinity, denan(crlibm.tanpi_ru(c.sup), -fpu.infinity)))
         else:
             return (crlibm.tanpi_rd(c.inf), crlibm.tanpi_ru(c.sup)),
 
@@ -209,13 +216,11 @@ else:
             return (-fpu.infinity, +fpu.infinity),
         if 0.0 in cos(interval.new((c,))):
             def denan(x, ifnan):
-                return x if x==x else ifnan
-            return (denan(crlibm.tan_rd(c.inf), fpu.infinity), fpu.infinity), (-fpu.infinity, denan(crlibm.tan_ru(c.sup), -fpu.infinity))
+                return x if x == x else ifnan
+            return (
+                (denan(crlibm.tan_rd(c.inf), fpu.infinity), fpu.infinity),
+                (-fpu.infinity, denan(crlibm.tan_ru(c.sup), -fpu.infinity)))
         else:
             return (crlibm.tan_rd(c.inf), crlibm.tan_ru(c.sup)),
 
     del monotonic
-
-if __name__  == '__main__':
-    import doctest
-    doctest.testmod()
