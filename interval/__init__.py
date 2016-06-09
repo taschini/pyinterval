@@ -15,6 +15,7 @@ into the current namespace:
 
 """
 
+from six import with_metaclass
 from . import fpu
 inf = fpu.infinity
 
@@ -51,7 +52,7 @@ class Metaclass(type):
         return self(arg)
 
 
-class interval(tuple):
+class interval(with_metaclass(Metaclass, tuple)):
     """A (multi-)interval on the extended real set.
 
     An interval is an immutable object that is created by specifying
@@ -81,8 +82,6 @@ class interval(tuple):
         interval([-5.0, -2.0], [2.5, 5.0])
 
     """
-
-    __metaclass__ = Metaclass
 
     def __new__(cls, *args):
         if len(args) == 1 and isinstance(args[0], cls):
@@ -394,6 +393,6 @@ interval.inverse = interval.function(getattr(interval.inverse, '__func__', inter
 
 
 # Clean up the namespace
-del coercing, comp_by_comp, Metaclass
+del coercing, comp_by_comp, Metaclass, with_metaclass
 
 from . import imath  # noqa

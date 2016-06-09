@@ -20,7 +20,7 @@ metadata = dict(
     author           = 'Stefano Taschini',
     author_email     = 'taschini@gmail.com',
     description      = 'Interval arithmetic in Python',
-    install_requires = ['crlibm>=1.0.2,==1.*'],
+    install_requires = ['crlibm>=1.0.2,==1.*', 'six>=1.10'],
     keywords         = 'interval crlibm',
     license          = 'BSD',
     long_description = read_long_description(),
