@@ -1,4 +1,4 @@
-# Copyright (c) 2008, Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2016, Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
@@ -8,11 +8,13 @@ This module provides helper functions that were deemed not fundamental
 and were not included in the interval or the fpu modules.
 """
 
-from interval import interval, fpu
+# We inject the interval class into the module namespace only for use in the
+# doctests:
+from interval import interval, fpu   # noqa
 
-@apply
+
 class ulprepr(object):
-    "Return the interger pair (n, k) such that x = n * ulp(x), ulp(x) = 2 ** k."
+    "Return two intergers n and k such that x = n * ulp(x), ulp(x) = 2 ** k."
 
     bits = 53
     mink = -1074
@@ -25,7 +27,9 @@ class ulprepr(object):
             self.bits = finfo.nmant + 1
             return vars(self)[name]
         else:
-            raise AttributeError("{!r} object has no attribute {!r}".format(type(self).__name__, name))
+            raise AttributeError(
+                "{0!r} object has no attribute {1!r}".
+                format(type(self).__name__, name))
 
     def __call__(self, x):
         if x == 0:
@@ -33,7 +37,10 @@ class ulprepr(object):
         import math
         m, e = math.frexp(x)
         k = max((e - self.bits, self.mink))
-        return int(m * 2 ** (e-k)), k
+        return int(m * 2 ** (e - k)), k
+
+ulprepr = ulprepr()
+
 
 def nudge(x, dir):
     "Nudge a float in the specified direction as many steps as abs(dir)."
@@ -44,11 +51,12 @@ def nudge(x, dir):
     if dir < -1:
         return nudge(nudge(x, -1), dir + 1)
     f = dir * 2 ** ulprepr(x)[1]
-    y = x + f/2.0
+    y = x + f / 2.0
     if y != x:
         return y
     else:
         return x + f
+
 
 def isexact(x):
     """True if all components of x contain exactly one number.
@@ -63,6 +71,7 @@ def isexact(x):
     """
     return all(c.inf == c.sup for c in x)
 
+
 def ulpwidth(x):
     """The widths of the components of x expressed as ULPs."""
     def diff(a, b):
@@ -75,6 +84,7 @@ def ulpwidth(x):
         h = min(e, f)
         return y * 2 ** (f - h) - x * 2 ** (e - h)
     return [diff(c.inf, c.sup) for c in x]
+
 
 def issharp(x):
     """True if each component of x width is at most 1 ULP.
