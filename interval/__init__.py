@@ -112,13 +112,7 @@ class interval(tuple):
 
         If the argument is an interval, it is returned unchanged. If
         the argument is not a scalar an interval.ScalarError is
-        raised::
-
-            >>> interval.cast('asd')
-            Traceback (most recent call last):
-            ...
-            ScalarError: Invalid scalar: 'asd'
-
+        raised.
         """
         if isinstance(x, cls):
             return x
@@ -126,7 +120,7 @@ class interval(tuple):
             y = fpu.float(x)
         except:
             raise cls.ScalarError("Invalid scalar: " + repr(x))
-        if isinstance(x, (int, long)) and x != y:
+        if fpu.isinteger(x) and x != y:
             # Special case for an integer with more bits than in a float's mantissa
             if x > y:
                 return cls.new((cls.Component(y, fpu.up(lambda: y + 1)),))
@@ -274,7 +268,7 @@ class interval(tuple):
     __rtruediv__ = __rdiv__
 
     def __pow__(self, n):
-        if not isinstance(n, (int, long)):
+        if not fpu.isinteger(n):
             return NotImplemented
         if n < 0:
             return (self ** -n).inverse()
@@ -362,8 +356,12 @@ class interval(tuple):
                 yield x
 
         def branch(current):
+            try:
+                _range = xrange
+            except NameError:  # pragma: nocover; reference coverage is Python 2
+                _range = range
             tracer_cb('branch', current)
-            for n in xrange(maxiter):
+            for n in _range(maxiter):
                 previous = current
                 for anchor in some(current):
                     current = step(anchor, current)

@@ -20,6 +20,8 @@ Limitations
 """
 
 float = float
+_min = min
+_max = max
 
 
 def _init_libm():  # pragma: nocover
@@ -126,25 +128,35 @@ def ensure_nonan(x):
 
 def min(l):
     "Return the minimum of the elements in l, or nan if any element is nan."
-    import __builtin__
     try:
-        return __builtin__.min(ensure_nonan(x) for x in l)
+        return _min(ensure_nonan(x) for x in l)
     except NanException:
         return nan
 
 
 def max(l):
     "Return the maximum of the elements in l, or nan if any element is nan."
-    import __builtin__
     try:
-        return __builtin__.max(ensure_nonan(x) for x in l)
+        return _max(ensure_nonan(x) for x in l)
     except NanException:
         return nan
 
 
+try:
+    long
+except NameError:  # pragma: nocover; reference coverage is Python 2
+    def isinteger(n):
+        "True if the argument is an instance of an integer type."""
+        return isinstance(n, int)
+else:
+    def isinteger(n):
+        "True if the argument is an instance of an integer type."""
+        return isinstance(n, (int, long))
+
+
 def power_rn(x, n):
     "Raise x to the n-th power (with n positive integer), rounded to nearest."
-    assert isinstance(n, (int, long)) and n >= 0
+    assert isinteger(n) and n >= 0
     l = ()
     while n > 0:
         n, y = divmod(n, 2)
