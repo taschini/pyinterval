@@ -10,24 +10,27 @@ class FpuTestCase(unittest.TestCase):
 
     def test_third(self):
         "Nearest rounding of 1/3 is downwards."
-        assert  1 / 3.0 == fpu.down(lambda: 1.0 /  3.0)
-        assert  1 / 3.0 <  fpu.up  (lambda: 1.0 /  3.0)
-        assert -1 / 3.0 == fpu.up  (lambda: 1.0 / -3.0)
-        assert -1 / 3.0 >  fpu.down(lambda: 1.0 / -3.0)
+        from operator import truediv
+        assert  1 / 3.0 == fpu.down(lambda: truediv(1.0,  3.0))
+        assert  1 / 3.0 <  fpu.up  (lambda: truediv(1.0,  3.0))
+        assert -1 / 3.0 == fpu.up  (lambda: truediv(1.0, -3.0))
+        assert -1 / 3.0 >  fpu.down(lambda: truediv(1.0, -3.0))
 
     def test_fourth(self):
         " 1/4 is exact."
-        assert  1 / 4.0 == fpu.down(lambda: 1.0 /  4.0)
-        assert  1 / 4.0 == fpu.up  (lambda: 1.0 /  4.0)
-        assert -1 / 4.0 == fpu.up  (lambda: 1.0 / -4.0)
-        assert -1 / 4.0 == fpu.down(lambda: 1.0 / -4.0)
+        from operator import truediv
+        assert  1 / 4.0 == fpu.down(lambda: truediv(1.0,  4.0))
+        assert  1 / 4.0 == fpu.up  (lambda: truediv(1.0,  4.0))
+        assert -1 / 4.0 == fpu.up  (lambda: truediv(1.0, -4.0))
+        assert -1 / 4.0 == fpu.down(lambda: truediv(1.0, -4.0))
 
     def test_fifth(self):
         "Nearest rounding of 1/5 is upwards."
-        assert  1 / 5.0 == fpu.up  (lambda: 1.0 /  5.0)
-        assert  1 / 5.0 >  fpu.down(lambda: 1.0 /  5.0)
-        assert -1 / 5.0 == fpu.down(lambda: 1.0 / -5.0)
-        assert -1 / 5.0 <  fpu.up  (lambda: 1.0 / -5.0)
+        from operator import truediv
+        assert  1 / 5.0 == fpu.up  (lambda: truediv(1.0,  5.0))
+        assert  1 / 5.0 >  fpu.down(lambda: truediv(1.0,  5.0))
+        assert -1 / 5.0 == fpu.down(lambda: truediv(1.0, -5.0))
+        assert -1 / 5.0 <  fpu.up  (lambda: truediv(1.0, -5.0))
 
     def test_ieee754(self):
         "fpu.float respect ieee754 semantics."
@@ -170,21 +173,25 @@ class IntervalTestCase(unittest.TestCase):
         assert interval[-1, 2]                       == (interval[-1, 2] ** -1) ** -1
         assert interval([-0.38712442133802405]) ** 3 == interval([-0.058016524353106828, -0.058016524353106808])
 
+        from operator import truediv
         assert (
             interval[
-                fpu.down(lambda: (1 / 3.0) * (1 / 3.0)),
-                fpu.up(lambda: (1 / 3.0) * (1 / 3.0))] ==
+                fpu.down(lambda: truediv(1, 3.0) * truediv(1, 3.0)),
+                fpu.up  (lambda: truediv(1, 3.0) * truediv(1, 3.0))] ==
             (interval[1] / 3.0) ** 2)
 
         assert (
             interval[
-                fpu.down(lambda: (1 / 3.0) * (1 / 3.0) * (1 / 3.0)),
-                fpu.up(lambda: (1 / 3.0) * (1 / 3.0) * (1 / 3.0))] ==
+                fpu.down(lambda: truediv(1, 3.0) * truediv(1, 3.0) * truediv(1, 3.0)),
+                fpu.up(lambda: truediv(1, 3.0) * truediv(1, 3.0) * truediv(1, 3.0))] ==
             (interval[1] / 3.0) ** 3)
 
     def test_format(self):
-        for x in interval[1], interval[1, 2], interval([1, 2], [3, 4]):
+        for x in interval[1], interval[1, 2], interval([1, 2], [3, 4]), interval[2, 2.0000000000000004]:
             assert x == eval(repr(x))
+        x = interval([1, 2])
+        assert str(x) == repr(x)
+
 
     def test_intersection(self):
         assert interval[1, 2] & interval[0, 3]             == interval[1, 2]
@@ -199,6 +206,7 @@ class IntervalTestCase(unittest.TestCase):
         assert interval([1, 6], 9)  == interval([1, 3], [4, 6]) | interval([2, 5], 9)
         assert interval[1, 2] | 2.1 == interval([1, 2], 2.1)
         assert 2.1 | interval[1, 2] == interval([1, 2], 2.1)
+        self.assertRaises(TypeError, lambda: interval[1, 2] | 1j)
 
     def test_hull(self):
         assert interval([1, 9]) == interval.hull((interval([1, 3], [4, 6]), interval([2, 5], 9)))
@@ -256,3 +264,16 @@ class NewtonTestCase(unittest.TestCase):
         assert interval() == interval[2, 5].newton(f, p)
         assert -s         == interval[-5, 0].newton(f, p)
         assert -s | s     == interval[-5, +5].newton(f, p)
+
+        # Failure to converge in only three iterations:
+        messages = []
+        assert interval() == interval[0, 2].newton(
+            f, p, maxiter=3,
+            tracer_cb = lambda tag, interval: messages.append((tag, interval)))
+        assert messages == [
+            ('branch' , interval[0.0, 2.0]),
+            ('step'   , interval[1.25, 2.0]),
+            ('step'   , interval[1.36875, 1.46484375]),
+            ('step'   , interval[1.4141253188320488, 1.4143005729166669]),
+            ('abandon', interval[1.4141253188320488, 1.4143005729166669])
+        ]

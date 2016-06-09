@@ -179,8 +179,9 @@ class ImathTestcase(unittest.TestCase):
         check(interval[-5.1, 1.2])
 
         from random import seed, random
+
         seed(123456)
-        for i in xrange(100):
+        for i in range(100):
             x = random()
             check(x)
             check(1 / x)
