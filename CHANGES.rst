@@ -1,7 +1,7 @@
 History
 -------
 
-1.1.0 (unreleased)
+1.1.0 (2016-06-10)
 ^^^^^^^^^^^^^^^^^^
 
 - Added support for Python 3.
