@@ -5,7 +5,7 @@ History
 ^^^^^^^^^^^^^^^^^^
 
 - Added support for Python 3.
-- Added :func:`interval.fpu.isinteger` as a portable way to check whether a
+- Added ``interval.fpu.isinteger`` as a portable way to check whether a
   value is an instance of an integer type.
 - Spun off Python binding to CRlibm into a separate project: PyCRlibm_.
 

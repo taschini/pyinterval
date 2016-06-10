@@ -1,1 +1,10 @@
 include test/*.py
+include *.rst
+include *.yml
+include LICENSE
+include tox.ini
+recursive-include appveyor *.ps1
+recursive-include doc *.css
+recursive-include doc *.py
+recursive-include doc *.rst
+recursive-include doc Makefile
