@@ -207,7 +207,7 @@ class interval(with_metaclass(Metaclass, tuple)):
 
     @property
     def midpoint(self):
-        return self.new(self.Component(x, x) for x in (sum(c)/2 for c in self))
+        return self.new(self.Component(x, x) for x in (sum(c) / 2 for c in self))
 
     @property
     def extrema(self):
@@ -348,7 +348,8 @@ class interval(with_metaclass(Metaclass, tuple)):
 
         """
         if tracer_cb is None:
-            def tracer_cb(tag, interval): pass
+            def tracer_cb(tag, interval):
+                pass
 
         def step(x, i):
             return (x - f(x) / p(i)) & i

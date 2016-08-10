@@ -91,7 +91,7 @@ else:
         "Square root."
         return interval.union(
             interval.hull(
-                exp(log(e)/2).newton(lambda z: z**2 - e, lambda z: 2 * z)
+                exp(log(e) / 2).newton(lambda z: z ** 2 - e, lambda z: 2 * z)
                 for e in c.extrema.components)
             for c in (x & interval[0, fpu.infinity]).components)
 
@@ -106,7 +106,7 @@ else:
             s, c = crlibm.sinh_rd(x), crlibm.cosh_ru(x)
             if fpu.infinity in (s, c):
                 return one_rd
-            return fpu.down(lambda: s/c)
+            return fpu.down(lambda: s / c)
 
         def tanh_ru(x):
             if x < 0:
@@ -116,7 +116,7 @@ else:
             s, c = crlibm.sinh_ru(x), crlibm.cosh_rd(x)
             if fpu.infinity in (s, c):
                 return 1.0
-            return fpu.up(lambda: s/c)
+            return fpu.up(lambda: s / c)
 
         @monotonic(rd=tanh_rd, ru=tanh_ru)
         def tanh(c):

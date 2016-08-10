@@ -192,7 +192,6 @@ class IntervalTestCase(unittest.TestCase):
         x = interval([1, 2])
         assert str(x) == repr(x)
 
-
     def test_intersection(self):
         assert interval[1, 2] & interval[0, 3]             == interval[1, 2]
         assert interval[1.1, 1.9] & interval[1.3, 2.5]     == interval[1.3, 1.9]
@@ -278,7 +277,7 @@ class NewtonTestCase(unittest.TestCase):
         messages = []
         assert interval() == interval[0, 2].newton(
             f, p, maxiter=3,
-            tracer_cb = lambda tag, interval: messages.append((tag, interval)))
+            tracer_cb=lambda tag, interval: messages.append((tag, interval)))
         assert messages == [
             ('branch' , interval[0.0, 2.0]),
             ('step'   , interval[1.25, 2.0]),
