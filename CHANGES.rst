@@ -1,7 +1,7 @@
 History
 -------
 
-1.1.1 (unreleased)
+1.1.1 (2016-08-10)
 ^^^^^^^^^^^^^^^^^^
 
 - Fixed `#5`_: Intervals can now be pickled and copied using the functions in the
