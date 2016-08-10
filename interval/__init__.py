@@ -100,6 +100,10 @@ class interval(with_metaclass(Metaclass, tuple)):
                 raise cls.ComponentError("Invalid interval component: " + repr(x))
         return cls.union(process(x) for x in args)
 
+    def __getnewargs__(self):
+        """Return the values passed to constructor upon unpickling."""
+        return tuple(tuple(c) for c in self)
+
     @classmethod
     def new(cls, components):
         "Create a new interval from existing components."

@@ -240,6 +240,15 @@ class IntervalTestCase(unittest.TestCase):
         assert interval[0, 4].midpoint == interval[2]
         assert interval(-1, 1, 4)      == interval(-1, [0, 2], [3, 5]).midpoint
 
+    def test_pickle_copy(self):
+        # https://github.com/taschini/pyinterval/issues/5
+        import copy
+        import pickle
+        a = interval([-3, -2], [0, 1])
+        assert a == pickle.loads(pickle.dumps(a, -1))
+        assert a == copy.copy(a)
+        assert a == copy.deepcopy(a)
+
 
 class NewtonTestCase(unittest.TestCase):
 
