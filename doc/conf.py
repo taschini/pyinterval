@@ -10,17 +10,23 @@
 # serve to show the default.
 
 import datetime as dt
-import os
-import sys
 
-cwd = os.getcwd()
-try:
-   os.chdir('..')
-   sys.path.insert(0, os.path.abspath('.'))
-   from setup import metadata
-finally:
-   os.chdir('.')
-   del cwd
+def metadata():
+   """Load metadata from setup file."""
+   import os
+   import sys
+
+   cwd = os.getcwd()
+   try:
+      os.chdir(os.path.dirname(__file__))
+      os.chdir('..')
+      sys.path.insert(0, os.path.abspath('.'))
+      from setup import metadata
+      return metadata
+   finally:
+      os.chdir(cwd)
+      del cwd
+metadata = metadata()
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
