@@ -4,14 +4,15 @@ History
 1.1.2 (unreleased)
 ^^^^^^^^^^^^^^^^^^
 
-- Nothing changed yet.
+- To improve readability, examples in the documentation are no longer
+  tested with Python 2.6.
 
 
 1.1.1 (2016-08-10)
 ^^^^^^^^^^^^^^^^^^
 
-- Fixed `#5`_: Intervals can now be pickled and copied using the functions in the
-  ``copy`` module.
+- Fixed `#5`_: Intervals can now be pickled and used with the
+  functions in the ``copy`` module.
 
 .. _#5: https://github.com/taschini/pyinterval/issues/5
 
