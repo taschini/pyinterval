@@ -37,6 +37,7 @@ metadata = dict(
         'develop': [
             'Sphinx',
             'flake8',
+            'pytest-cov',
             'tox',
             'zest.releaser[recommended]',
         ]
