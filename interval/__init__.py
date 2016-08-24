@@ -362,7 +362,7 @@ class interval(with_metaclass(Metaclass, tuple)):
         def branch(current):
             try:
                 _range = xrange
-            except NameError:  # pragma: nocover; reference coverage is Python 2
+            except NameError:  # pragma: PY3 only
                 _range = range
             tracer_cb('branch', current)
             for n in _range(maxiter):

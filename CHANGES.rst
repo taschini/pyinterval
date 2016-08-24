@@ -6,6 +6,9 @@ History
 
 - To improve readability, examples in the documentation are no longer
   tested with Python 2.6.
+- Code pathways that are specific to one Python version are marked
+  with ``# pragma`` directives, and the collection of coverage
+  statistics ignores them as appropriate.
 
 
 1.1.1 (2016-08-10)

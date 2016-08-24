@@ -144,11 +144,11 @@ def max(l):
 
 try:
     long
-except NameError:  # pragma: nocover; reference coverage is Python 2
+except NameError:  # pragma: PY3 only
     def isinteger(n):
         "True if the argument is an instance of an integer type."""
         return isinstance(n, int)
-else:
+else:              # pragma: PY2 only
     def isinteger(n):
         "True if the argument is an instance of an integer type."""
         return isinstance(n, (int, long))

@@ -1,0 +1,8 @@
+[run]
+source = interval
+
+[report]
+show_missing = True
+
+[html]
+directory = build/htmlcov
