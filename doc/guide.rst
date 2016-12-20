@@ -66,7 +66,7 @@ divided:
     >>> interval[1] / interval[3]
     interval([0.3333333333333333, 0.33333333333333337])
 
-inersected:
+intersected:
 
     >>> interval[1, 4] & interval[2, 5]
     interval([2.0, 4.0])
