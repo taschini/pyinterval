@@ -84,6 +84,11 @@ raised to integer power:
     >>> interval[-3, 2] ** 2
     interval([0.0, 9.0])
 
+You can take the absolute value of an interval:
+
+    >>> abs(interval[-3, 2])
+    interval([0.0, 3.0])
+
 Scalar numbers are automatically cast as intervals when used as
 operands together with intervals:
 

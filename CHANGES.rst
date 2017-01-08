@@ -10,6 +10,9 @@ History
   with ``# pragma`` directives, and the collection of coverage
   statistics ignores them as appropriate.
 - Python 3.6 is now officially supported.
+- Implement `#11`_: Take the absolute value of an interval.
+
+.. _#11: https://github.com/taschini/pyinterval/issues/11
 
 
 1.1.1 (2016-08-10)

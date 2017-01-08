@@ -207,6 +207,11 @@ class IntervalTestCase(unittest.TestCase):
         assert 2.1 | interval[1, 2] == interval([1, 2], 2.1)
         self.assertRaises(TypeError, lambda: interval[1, 2] | 1j)
 
+    def test_abs(self):
+        assert interval([0, 3])     == abs(interval[-3, 2])
+        assert interval([1, 6], 9)  == abs(interval([-9], [-5, -2], [1, 3], [4, 6]))
+        assert interval([1, 6], 9)  == abs(interval([9], [2, 5], [-3, -1], [-6, -4]))
+
     def test_hull(self):
         assert interval([1, 9]) == interval.hull((interval([1, 3], [4, 6]), interval([2, 5], 9)))
 

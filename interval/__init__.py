@@ -306,6 +306,9 @@ class interval(with_metaclass(Metaclass, tuple)):
     def __contains__(self, other):
         return all(any(x.inf <= y.inf and y.sup <= x.sup for x in self) for y in other)
 
+    def __abs__(self):
+        return type(self)[0, inf] & (self | (-self))
+
     class ComponentError(ValueError):
         pass
 
