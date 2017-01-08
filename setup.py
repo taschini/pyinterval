@@ -31,7 +31,7 @@ metadata = dict(
     test_suite       = 'test',
     tests_require    = [],
     url              = "https://github.com/taschini/pyinterval",
-    version          = '1.1.2.dev0',
+    version          = '1.2.0.dev0',
     zip_safe         = False,
     extras_require   = {
         'develop': [

@@ -1,7 +1,7 @@
 History
 -------
 
-1.1.2 (unreleased)
+1.2.0 (unreleased)
 ^^^^^^^^^^^^^^^^^^
 
 - To improve readability, examples in the documentation are no longer
