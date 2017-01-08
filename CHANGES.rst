@@ -9,6 +9,7 @@ History
 - Code pathways that are specific to one Python version are marked
   with ``# pragma`` directives, and the collection of coverage
   statistics ignores them as appropriate.
+- Python 3.6 is now officially supported.
 
 
 1.1.1 (2016-08-10)
