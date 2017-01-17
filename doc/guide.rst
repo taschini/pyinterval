@@ -134,18 +134,32 @@ interval:
     >>> len(interval(1, 2))
     2
 
-It is possible to iterate on the connected components of an interval
-as in the statement
+You can iterate on the connected components of an interval:
 
-   >>> [x for x in interval([1, 2], 3).components]
-   [interval([1.0, 2.0]), interval([3.0])]
+    >>> [x for x in interval([1, 2], 3)]
+    [(1.0, 2.0), (3.0, 3.0)]
 
-The endpoints are given by
+Each component behaves like a named tuple:
 
-   >>> interval([1, 2], 3).extrema
-   interval([1.0], [2.0], [3.0])
+    >>> x = interval([1, 2], 3)
+    >>> x[0].inf
+    1.0
+
+    >>> x[1].sup
+    3.0
+
+You can use the `components` attribute to iterate over the components
+so that each component is itself an interval:
+
+    >>> [x for x in interval([1, 2], 3).components]
+    [interval([1.0, 2.0]), interval([3.0])]
+
+Similarly, the endpoints are given by
+
+    >>> interval([1, 2], 3).extrema
+    interval([1.0], [2.0], [3.0])
 
 and the midpoints by
 
-   >>> interval([1, 2], 3).midpoint
-   interval([1.5], [3.0])
+    >>> interval([1, 2], 3).midpoint
+    interval([1.5], [3.0])
