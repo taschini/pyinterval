@@ -203,14 +203,20 @@ class interval(with_metaclass(Metaclass, tuple)):
 
     @property
     def components(self):
+        """Iterator on the connectect components of an interval.
+
+        Each component is itself an interval.
+        """
         return (self.new((x,)) for x in self)
 
     @property
     def midpoint(self):
+        """The interval consisting only of the midpoints of each component."""
         return self.new(self.Component(x, x) for x in (sum(c) / 2 for c in self))
 
     @property
     def extrema(self):
+        """The interval consisting only of the extrema of each component."""
         return self._canonical(self.Component(x, x) for c in self for x in c)
 
     def __repr__(self):
