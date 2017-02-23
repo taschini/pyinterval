@@ -58,5 +58,24 @@ metadata = dict(
     ],
 )
 
+
+def check_pip():
+    try:
+        from pip._vendor.pkg_resources import parse_requirements
+    except ImportError:
+        return
+
+    reqs = metadata['install_requires']
+
+    try:
+        [r for s in reqs for r in parse_requirements(s)]
+    except ValueError:
+        exit("\n"
+             "To install this library your must upgrade pip.\n"
+             "Please run:\n"
+             "   python -m pip install --upgrade pip\n")
+
+
 if __name__ == '__main__':
+    check_pip()
     setup(**metadata)

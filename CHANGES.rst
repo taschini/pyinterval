@@ -11,9 +11,11 @@ History
   statistics ignores them as appropriate.
 - Add support for Python 3.6.
 - Implement `#11`_: Take the absolute value of an interval.
+- Provide a helpful message during installation if setuptools is
+  outdated (`#13`_).
 
 .. _#11: https://github.com/taschini/pyinterval/issues/11
-
+.. _#13: https://github.com/taschini/pyinterval/issues/13
 
 1.1.1 (2016-08-10)
 ^^^^^^^^^^^^^^^^^^
