@@ -4,7 +4,7 @@ History
 1.2.1 (unreleased)
 ^^^^^^^^^^^^^^^^^^
 
-- Nothing changed yet.
+- Test installation with an outdated Pip.
 
 
 1.2.0 (2017-03-05)
