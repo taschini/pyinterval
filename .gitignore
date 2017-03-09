@@ -1,6 +1,9 @@
-build/
-/dist/
-deps/crlibm*
-*.pyc
 *.egg-info/
-/crlibm.so
+*.pyc
+/.cache/
+/.eggs/
+/.python-version
+/.tox/
+/build/
+/dist/
+/env/
