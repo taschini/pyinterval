@@ -5,6 +5,7 @@ Installation
 
 The most convenient way to install this library is with pip_::
 
+    pip install --upgrade pip
     pip install pyinterval
 
 Note that this project depends on crlibm_.
