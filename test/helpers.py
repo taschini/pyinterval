@@ -9,10 +9,7 @@ and were not included in the interval or the fpu modules.
 """
 
 import sys
-
-# We inject the interval class into the module namespace only for use in the
-# doctests:
-from interval import interval, fpu   # noqa
+from interval import fpu
 
 
 def ulprepr(x, bits=sys.float_info.mant_dig, mink=sys.float_info.min_exp - sys.float_info.mant_dig):
