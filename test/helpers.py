@@ -8,38 +8,22 @@ This module provides helper functions that were deemed not fundamental
 and were not included in the interval or the fpu modules.
 """
 
+import sys
+
 # We inject the interval class into the module namespace only for use in the
 # doctests:
 from interval import interval, fpu   # noqa
 
 
-class ulprepr(object):
-    "Return two intergers n and k such that x = n * ulp(x), ulp(x) = 2 ** k."
+def ulprepr(x, bits=sys.float_info.mant_dig, mink=sys.float_info.min_exp - sys.float_info.mant_dig):
+    "Return two integers n and k such that x = n * ulp(x), ulp(x) = 2 ** k."
 
-    bits = 53
-    mink = -1074
-
-    def __getattr__(self, name):
-        if name in ('mink', 'bits'):
-            from numpy import finfo
-            finfo = finfo(float)
-            self.mink = finfo.minexp - finfo.nmant
-            self.bits = finfo.nmant + 1
-            return vars(self)[name]
-        else:
-            raise AttributeError(
-                "{0!r} object has no attribute {1!r}".
-                format(type(self).__name__, name))
-
-    def __call__(self, x):
-        if x == 0:
-            return 0, self.mink
-        import math
-        m, e = math.frexp(x)
-        k = max((e - self.bits, self.mink))
-        return int(m * 2 ** (e - k)), k
-
-ulprepr = ulprepr()
+    if x == 0:
+        return 0, mink
+    import math
+    m, e = math.frexp(x)
+    k = max((e - bits, mink))
+    return int(m * 2 ** (e - k)), k
 
 
 def nudge(x, dir):
