@@ -1,6 +1,4 @@
-#! /usr/bin/env python
-
-# Copyright (c) 2008-2016 Stefano Taschini <taschini@ieee.org>
+# Copyright (c) 2008-2017, Stefano Taschini <taschini@ieee.org>
 # All rights reserved.
 # See LICENSE for details.
 
@@ -8,10 +6,12 @@ from setuptools import setup
 
 
 def read_long_description():
+    import os
     import io
     parts = []
+    prefix = os.path.dirname(__file__)
     for filename in 'README.rst', 'CHANGES.rst':
-        with io.open(filename, encoding='utf-8') as f:
+        with io.open(os.path.join(prefix, filename), encoding='utf-8') as f:
             parts.append(f.read())
     return '\n'.join(parts)
 
