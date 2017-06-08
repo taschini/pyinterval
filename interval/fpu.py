@@ -19,9 +19,11 @@ Limitations
 
 """
 
-float = float
 _min = min
 _max = max
+
+# Retained for API compatibility
+float = float
 
 
 def _init_libm():  # pragma: nocover
@@ -75,18 +77,13 @@ def _init():  # pragma: nocover
             "Cannot determine FPU control primitives. "
             "The fpu module is not correcly initialized.",
             stacklevel=2)
+
+
 _init()
 
 
-def infinity():
-    global infinity, nan
-    try:
-        infinity = float('inf')
-    except:  # pragma: nocover; useful only for Python < 2.6
-        import struct
-        infinity = struct.unpack('!d', b'\x7f\xf0\x00\x00\x00\x00\x00\x00')[0]
-    nan = infinity / infinity
-infinity()
+infinity = float('inf')
+nan = float('nan')
 
 
 def isnan(x):
@@ -142,16 +139,10 @@ def max(l):
         return nan
 
 
-try:
-    long
-except NameError:  # pragma: PY3 only
-    def isinteger(n):
-        "True if the argument is an instance of an integer type."""
-        return isinstance(n, int)
-else:              # pragma: PY2 only
-    def isinteger(n):
-        "True if the argument is an instance of an integer type."""
-        return isinstance(n, (int, long))
+def isinteger(n):
+    "True if the argument is an instance of an integer type."""
+    from numbers import Integral
+    return isinstance(n, Integral)
 
 
 def power_rn(x, n):

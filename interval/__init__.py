@@ -120,7 +120,7 @@ class interval(with_metaclass(Metaclass, tuple)):
         if isinstance(x, cls):
             return x
         try:
-            y = fpu.float(x)
+            y = float(x)
         except:
             raise cls.ScalarError("Invalid scalar: " + repr(x))
         if fpu.isinteger(x) and x != y:
