@@ -28,7 +28,7 @@ hosted on GitHub_::
 .. _pypi: http://pypi.python.org/pypi/pyinterval/
 
 
-Semantic Versioning
+Semantic versioning
 -------------------
 
 Starting with version 1.0.0, this project follows a `semantic

@@ -9,6 +9,7 @@ Contents
    install
    guide
    api
+   develop
    history
    license
 

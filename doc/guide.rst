@@ -5,23 +5,17 @@ This document gives an overview of how to use the `interval` class.
 
 .. contents::
 
+
 Construction
 ------------
 
-The ``interval`` package can be loaded into the Python interpreter with the statement
-
-    >>> from interval import interval, inf, imath
-
-which injects in the current namespace the interval class, a constant
-representing the mathematical infinity, and a module providing
-interval transcendental functions.
-
 Intervals are immutable objects that can be created by specifying their connected components:
 
+    >>> from interval import interval
     >>> k = interval([0, 1], [2, 3], [10, 15])
 
 creates an object representing the union of the mathematical intervals
-[0, 1], [2, 3] and [10, 15].
+[0, 1], [2, 3] and [10, 15], whereas
 
     >>> interval[1, 2]
     interval([1.0, 2.0])
@@ -42,6 +36,13 @@ An empty interval has no components:
 
     >>> interval()
     interval()
+
+An interval can be infinite:
+
+    >>> from interval import inf
+    >>> 10**300 in interval([0, inf])
+    True
+
 
 Operations
 ----------
@@ -98,8 +99,10 @@ operands together with intervals:
 The `imath <#module-interval.imath>`_ module provides transcendental
 functions that accept interval arguments. For instance,
 
+    >>> from interval import imath
     >>> imath.exp(interval[0, 1])
     interval([1.0, 2.7182818284590455])
+
 
 Inspection
 ----------
