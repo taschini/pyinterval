@@ -118,7 +118,7 @@ else:
                 return 1.0
             return fpu.up(lambda: s / c)
 
-        @monotonic(rd=tanh_rd, ru=tanh_ru)
+        @monotonic(rd=tanh_rd, ru=tanh_ru)  # noqa
         def tanh(c):
             "Hyberbolic tangent."
 
