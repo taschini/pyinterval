@@ -193,6 +193,7 @@ class ImathTestcase(unittest.TestCase):
         assert imath.cospi(-fpu.infinity)       == interval[-1, 1]
         assert imath.cospi(interval[0.5, 1.5])  == interval[-1, 0]
         assert imath.cospi(interval[-0.5, 0.5]) == interval[0, 1]
+        assert imath.cospi(interval[-0.1, 1.1]) == interval[-1, 1]
         assert imath.cospi(1 / interval[3])     == interval[helpers.nudge(0.5, -2), helpers.nudge(0.5, 1)]
         assert imath.cospi(-1 / interval[3])    == interval[helpers.nudge(0.5, -2), helpers.nudge(0.5, 1)]
         assert imath.cospi(2 / interval[3])     == interval[helpers.nudge(-0.5, -2), helpers.nudge(-0.5, 2)]
@@ -224,9 +225,20 @@ class ImathTestcase(unittest.TestCase):
 
     def test_trig(self):
         assert imath.sin(imath.pi / 2)           == interval[helpers.nudge(1, -1), 1]
+        assert imath.sin(-imath.pi / 2)          == interval[-1, helpers.nudge(-1, +1)]
+        assert imath.sin(interval[0, 6.29])      == interval[-1, 1]
+        assert imath.sin(interval[-1.58, +1.58]) == interval[-1, 1]
+        assert imath.sin(imath.pi / 6)           == interval[helpers.nudge(0.5, -1), helpers.nudge(0.5, 2)]
+
         assert imath.cos(imath.pi)               == interval[-1, helpers.nudge(-1, +1)]
-        assert imath.cos(imath.pi / interval[3]) == interval[helpers.nudge(0.5, -6), helpers.nudge(0.5, 1)]
+        assert imath.cos(2 * imath.pi)           == interval[helpers.nudge(1, -1), 1]
+        assert imath.cos(interval[-0.1, 3.15])   == interval[-1, 1]
+        assert imath.cos(interval[-3.15, 3.15])  == interval[-1, 1]
+        assert imath.cos(imath.pi / 3)           == interval[helpers.nudge(0.5, -6), helpers.nudge(0.5, 1)]
+
+        assert imath.tan(interval[-0.1, 3.15])   == interval[-inf, +inf]
         assert imath.tan(imath.pi / 4)           == interval[helpers.nudge(1, -1), helpers.nudge(1, +1)]
+        assert imath.tan(interval[0, 0.75 * math.pi]) == interval([-inf, -1], [0, +inf])
 
     def test_constants(self):
         assert helpers.issharp(imath.pi)
